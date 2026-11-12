@@ -1,0 +1,74 @@
+[
+  {
+    "id": "qc-0901",
+    "checked_on": "2026-09-07",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик А «АльфаБумага»",
+    "checked_units": 400,
+    "defective_units": 7
+  },
+  {
+    "id": "qc-0902",
+    "checked_on": "2026-09-14",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик А «АльфаБумага»",
+    "checked_units": 300,
+    "defective_units": 5
+  },
+  {
+    "id": "qc-0903",
+    "checked_on": "2026-09-28",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик А «АльфаБумага»",
+    "checked_units": 300,
+    "defective_units": 6
+  },
+  {
+    "id": "qc-1001",
+    "checked_on": "2026-10-06",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик А «АльфаБумага»",
+    "checked_units": 200,
+    "defective_units": 4
+  },
+  {
+    "id": "qc-1002",
+    "checked_on": "2026-10-20",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик Б «БелЛист»",
+    "checked_units": 400,
+    "defective_units": 18
+  },
+  {
+    "id": "qc-1003",
+    "checked_on": "2026-10-30",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик Б «БелЛист»",
+    "checked_units": 400,
+    "defective_units": 19
+  },
+  {
+    "id": "qc-1101",
+    "checked_on": "2026-11-03",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик Б «БелЛист»",
+    "checked_units": 200,
+    "defective_units": 8
+  },
+  {
+    "id": "qc-1102",
+    "checked_on": "2026-11-10",
+    "product": "Фотокнига 20x20",
+    "line": "Переплётная №1",
+    "paper_supplier": "Поставщик Б «БелЛист»",
+    "checked_units": 200,
+    "defective_units": 4
+  }
+]

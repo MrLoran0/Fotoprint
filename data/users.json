@@ -1,0 +1,4 @@
+[
+  {"id": "u-director", "login": "director", "full_name": "Анна Смирнова", "role": "director", "department_id": "management", "employee_id": "e-smirnova"},
+  {"id": "u-morozov", "login": "morozov", "full_name": "Илья Морозов", "role": "production_head", "department_id": "production", "employee_id": "e-morozov"}
+]

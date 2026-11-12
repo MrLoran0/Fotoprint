@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mes_quality",
+    "name": "Производство: журнал контроля качества",
+    "updated_at": "2026-11-11T08:00:00+03:00",
+    "stale_after_hours": 24
+  },
+  {
+    "id": "erp_orders",
+    "name": "ERP: заказы",
+    "updated_at": "2026-11-11T07:30:00+03:00",
+    "stale_after_hours": 24
+  },
+  {
+    "id": "crm_support",
+    "name": "CRM: обращения клиентов",
+    "updated_at": "2026-11-08T18:00:00+03:00",
+    "stale_after_hours": 24
+  }
+]

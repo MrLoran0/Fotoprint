@@ -1,0 +1,111 @@
+{
+  "transcript": "control-1111.txt",
+  "meeting_id": "m-control-1111",
+  "split": "holdout",
+  "timezone": "Europe/Minsk",
+  "relative_due_rule": "От даты встречи, 18:00 при отсутствии времени; вычисляет код.",
+  "items": [
+    {
+      "kind": "discussion",
+      "statement": "Снижение дефектов не доказывает влияние входного контроля",
+      "segment_id": 2,
+      "evidence_quote": "Обсуждаем наблюдение: дефектов меньше, но причинное влияние входного контроля не доказано. Итоговых испытаний ещё нет.",
+      "decision_status": "discussed"
+    },
+    {
+      "kind": "proposal",
+      "statement": "Объединить контроль бумаги и готовой книги одной отметкой",
+      "segment_id": 3,
+      "evidence_quote": "Предлагаю объединить контроль бумаги и контроль готовой книги в одну отметку журнала.",
+      "decision_status": "proposed",
+      "context_segment_ids": [
+        4
+      ]
+    },
+    {
+      "kind": "decision",
+      "statement": "Сохранить раздельные журналы входного и готового контроля",
+      "segment_id": 5,
+      "evidence_quote": "Решили сохранить раздельные журналы входного контроля и контроля готовых фотокниг.",
+      "decision_status": "decided"
+    },
+    {
+      "kind": "task",
+      "statement": "Подготовить перечень партий с неполными отметками",
+      "segment_id": 6,
+      "evidence_quote": "Лена, подготовь перечень партий с неполными отметками до 12.11.2026. Результат — список партий и отсутствующих полей.",
+      "decision_status": null,
+      "owner": "e-kozlova",
+      "owner_raw": "Лена",
+      "owner_origin": "explicit",
+      "due": "2026-11-12",
+      "due_at": "2026-11-12T18:00:00+03:00",
+      "due_raw": "до 12.11.2026",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Сверить маркировку А-1001 с журналом",
+      "segment_id": 8,
+      "evidence_quote": "Паша, сверь маркировку остатков А-1001 с журналом до завтра. Результат — акт сверки маркировки.",
+      "decision_status": null,
+      "owner": "e-zaitsev",
+      "owner_raw": "Паша",
+      "owner_origin": "explicit",
+      "due": "2026-11-12",
+      "due_at": "2026-11-12T18:00:00+03:00",
+      "due_raw": "до завтра",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Подготовить схему возврата незакрытых поручений в повестку",
+      "segment_id": 10,
+      "evidence_quote": "Нужно подготовить схему возврата незакрытых поручений в следующую повестку до 13.11.2026. Владельца ещё не назначаем.",
+      "decision_status": null,
+      "owner": null,
+      "owner_raw": null,
+      "owner_origin": "unknown",
+      "due": "2026-11-13",
+      "due_at": "2026-11-13T18:00:00+03:00",
+      "due_raw": "до 13.11.2026",
+      "due_origin": "explicit",
+      "needs_clarification": [
+        "owner_employee_id"
+      ]
+    },
+    {
+      "kind": "task",
+      "statement": "Описать причины повторных обращений по расслоению",
+      "segment_id": 11,
+      "evidence_quote": "Олег, опиши причины повторных обращений по расслоению. Срок пока не назначаю.",
+      "decision_status": null,
+      "owner": "e-belov",
+      "owner_raw": "Олег",
+      "owner_origin": "explicit",
+      "due": null,
+      "due_at": null,
+      "due_raw": null,
+      "due_origin": "unknown",
+      "needs_clarification": [
+        "due_at"
+      ]
+    },
+    {
+      "kind": "question",
+      "statement": "Как согласовывать новый срок клиенту при продлении проверки?",
+      "segment_id": 13,
+      "evidence_quote": "Вопрос: как согласовывать новый срок клиенту, если проверка бумаги продлевается?",
+      "decision_status": "needs_clarification"
+    },
+    {
+      "kind": "risk",
+      "statement": "Сертификат Б-1102 задержится при ограниченном запасе бумаги",
+      "segment_id": 14,
+      "evidence_quote": "Риск: сертификат Б-1102 снова задержится, а запас разрешённой бумаги ограничен.",
+      "decision_status": "discussed"
+    }
+  ]
+}

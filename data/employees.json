@@ -1,0 +1,152 @@
+[
+  {
+    "id": "e-smirnova",
+    "full_name": "Анна Смирнова",
+    "position": "Директор",
+    "department_id": "management",
+    "email": "a.smirnova@fotoprint.test",
+    "aliases": [
+      "Анна",
+      "Смирнова"
+    ],
+    "responsibilities": [
+      "стратегия",
+      "бюджет",
+      "решения по поставщикам"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-morozov",
+    "full_name": "Илья Морозов",
+    "position": "Руководитель производства",
+    "department_id": "production",
+    "email": "i.morozov@fotoprint.test",
+    "aliases": [
+      "Илья",
+      "Морозов"
+    ],
+    "responsibilities": [
+      "план выпуска",
+      "загрузка мощностей",
+      "качество продукции"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-petrova",
+    "full_name": "Мария Петрова",
+    "position": "Менеджер по закупкам",
+    "department_id": "production",
+    "email": "m.petrova@fotoprint.test",
+    "aliases": [
+      "Мария",
+      "Петрова",
+      "Маша"
+    ],
+    "responsibilities": [
+      "закупка бумаги и материалов",
+      "работа с поставщиками",
+      "сертификаты партий"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-volkov",
+    "full_name": "Дмитрий Волков",
+    "position": "Технолог печати",
+    "department_id": "production",
+    "email": "d.volkov@fotoprint.test",
+    "aliases": [
+      "Дмитрий",
+      "Волков",
+      "Дима"
+    ],
+    "responsibilities": [
+      "настройка оборудования",
+      "техкарты",
+      "испытания материалов"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-kozlova",
+    "full_name": "Елена Козлова",
+    "position": "Инженер по качеству",
+    "department_id": "production",
+    "email": "e.kozlova@fotoprint.test",
+    "aliases": [
+      "Елена",
+      "Козлова",
+      "Лена"
+    ],
+    "responsibilities": [
+      "входной контроль",
+      "отчёты по браку",
+      "разбор рекламаций"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-belov",
+    "full_name": "Олег Белов",
+    "position": "Руководитель поддержки",
+    "department_id": "support",
+    "email": "o.belov@fotoprint.test",
+    "aliases": [
+      "Олег",
+      "Белов"
+    ],
+    "responsibilities": [
+      "обращения клиентов",
+      "SLA поддержки",
+      "шаблоны ответов"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-sokolov",
+    "full_name": "Роман Соколов",
+    "position": "Руководитель коммерческого отдела",
+    "department_id": "commercial",
+    "email": "r.sokolov@fotoprint.test",
+    "aliases": [
+      "Роман",
+      "Соколов",
+      "Рома"
+    ],
+    "responsibilities": [
+      "план продаж",
+      "обещанные сроки заказов",
+      "коммуникация с заказчиками"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  },
+  {
+    "id": "e-zaitsev",
+    "full_name": "Павел Зайцев",
+    "position": "Мастер переплётного участка",
+    "department_id": "production",
+    "email": "p.zaitsev@fotoprint.test",
+    "aliases": [
+      "Павел",
+      "Зайцев",
+      "Паша"
+    ],
+    "responsibilities": [
+      "сменные журналы",
+      "переплётная линия",
+      "учёт материалов",
+      "выдача партий в производство"
+    ],
+    "work_start": "09:00",
+    "work_end": "18:00"
+  }
+]

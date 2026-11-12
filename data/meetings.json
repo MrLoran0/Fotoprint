@@ -1,0 +1,66 @@
+[
+  {
+    "id": "m-quality-1104",
+    "title": "Оперативка по качеству фотокниг",
+    "topic": "Рост брака фотокниг после смены бумаги",
+    "starts_at": "2026-11-04T10:00:00+03:00",
+    "ends_at": "2026-11-04T10:15:00+03:00",
+    "timezone": "Europe/Minsk",
+    "organizer_user_id": "u-morozov",
+    "department_id": "production",
+    "participant_ids": [
+      "e-morozov",
+      "e-petrova",
+      "e-volkov",
+      "e-kozlova",
+      "e-zaitsev"
+    ],
+    "previous_meeting_id": null,
+    "status": "held",
+    "transcript_file": "quality-1104.txt"
+  },
+  {
+    "id": "m-quality-1109",
+    "title": "Контроль испытаний и незакрытых поручений",
+    "topic": "Рост брака фотокниг после смены бумаги",
+    "starts_at": "2026-11-09T10:00:00+03:00",
+    "ends_at": "2026-11-09T10:30:00+03:00",
+    "timezone": "Europe/Minsk",
+    "organizer_user_id": "u-morozov",
+    "department_id": "production",
+    "participant_ids": [
+      "e-morozov",
+      "e-petrova",
+      "e-volkov",
+      "e-kozlova",
+      "e-zaitsev",
+      "e-belov",
+      "e-sokolov"
+    ],
+    "previous_meeting_id": "m-quality-1104",
+    "status": "held",
+    "transcript_file": "quality-1109.txt"
+  },
+  {
+    "id": "m-control-1111",
+    "title": "Контрольная оперативка качества — отложенная проверка №3",
+    "topic": "Рост брака фотокниг после смены бумаги",
+    "starts_at": "2026-11-11T10:00:00+03:00",
+    "ends_at": "2026-11-11T10:30:00+03:00",
+    "timezone": "Europe/Minsk",
+    "organizer_user_id": "u-morozov",
+    "department_id": "production",
+    "participant_ids": [
+      "e-morozov",
+      "e-petrova",
+      "e-volkov",
+      "e-kozlova",
+      "e-zaitsev",
+      "e-belov",
+      "e-sokolov"
+    ],
+    "previous_meeting_id": "m-quality-1109",
+    "status": "held",
+    "transcript_file": "control-1111.txt"
+  }
+]

@@ -1,0 +1,66 @@
+{
+  "transcript": "demo-short.txt",
+  "meeting_id": "m-quality-1104",
+  "split": "demo",
+  "timezone": "Europe/Minsk",
+  "relative_due_rule": "От даты встречи, 18:00 при отсутствии времени; вычисляет код.",
+  "items": [
+    {
+      "kind": "decision",
+      "statement": "Вернуть входной контроль каждой партии",
+      "segment_id": 1,
+      "evidence_quote": "За октябрь брак 4,1%: 41 фотокнига из 1000. Решили вернуть входной контроль каждой партии.",
+      "decision_status": "decided"
+    },
+    {
+      "kind": "proposal",
+      "statement": "Полностью вернуться к прежнему поставщику",
+      "segment_id": 2,
+      "evidence_quote": "Предлагаю полностью вернуться к прежнему поставщику.",
+      "decision_status": "proposed",
+      "context_segment_ids": [
+        3
+      ]
+    },
+    {
+      "kind": "task",
+      "statement": "Провести испытания обеих бумаг на одной настройке",
+      "segment_id": 3,
+      "evidence_quote": "Пока не решаем. Дима, проведи испытания обеих бумаг на одной настройке до пятницы.",
+      "decision_status": null,
+      "owner": "e-volkov",
+      "owner_raw": "Дима",
+      "owner_origin": "explicit",
+      "due": "2026-11-06",
+      "due_at": "2026-11-06T18:00:00+03:00",
+      "due_raw": "до пятницы",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Запросить сертификат Б-1102",
+      "segment_id": 5,
+      "evidence_quote": "Нужно запросить сертификат партии Б-1102; владельца и срок уточним отдельно.",
+      "decision_status": null,
+      "owner": null,
+      "owner_raw": null,
+      "owner_origin": "unknown",
+      "due": null,
+      "due_at": null,
+      "due_raw": null,
+      "due_origin": "unknown",
+      "needs_clarification": [
+        "owner_employee_id",
+        "due_at"
+      ]
+    },
+    {
+      "kind": "risk",
+      "statement": "Задержка выпуска, если сертификат не придёт",
+      "segment_id": 6,
+      "evidence_quote": "Риск — задержка выпуска, если сертификат не придёт.",
+      "decision_status": "discussed"
+    }
+  ]
+}

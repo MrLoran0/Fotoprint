@@ -1,0 +1,138 @@
+{
+  "scenario_now": "2026-11-11T12:00:00+03:00",
+  "note": "Ожидаемые предложения сторожа; сообщения не меняют реестр. Сторож в этой ветке не реализуется.",
+  "cases": [
+    {
+      "id": "owner-certificates",
+      "type": "contradiction",
+      "task_id": "t-certificates-1104",
+      "registry": {
+        "owner_employee_id": null,
+        "due_at": "2026-11-06T18:00:00+03:00"
+      },
+      "statement": {
+        "owner_employee_id": "e-petrova",
+        "due_at": "2026-11-13T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "mail-petrova",
+        "external_id": "v2-certificates-owner@fotoprint.test",
+        "document_id": "mail-petrova:7721115b75b3"
+      },
+      "quote": "беру на себя t-certificates-1104"
+    },
+    {
+      "id": "due-trials",
+      "type": "contradiction",
+      "task_id": "t-trials-1104",
+      "registry": {
+        "due_at": "2026-11-06T18:00:00+03:00"
+      },
+      "statement": {
+        "due_at": "2026-11-13T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "tg-production",
+        "external_id": "1001/6",
+        "document_id": "tg-production:2026-11-10"
+      },
+      "quote": "подготовлю до 13.11.2026"
+    },
+    {
+      "id": "status-template",
+      "type": "contradiction",
+      "task_id": "t-client-template-1109",
+      "registry": {
+        "status": "in_progress"
+      },
+      "statement": {
+        "status": "done"
+      },
+      "source": {
+        "channel_id": "chat-support",
+        "external_id": "s1",
+        "document_id": "chat-support:2026-11-11"
+      },
+      "quote": "считаю задачу выполненной"
+    },
+    {
+      "id": "owner-crm",
+      "type": "contradiction",
+      "task_id": "t-crm-refresh",
+      "registry": {
+        "owner_employee_id": "e-belov",
+        "due_at": "2026-11-10T18:00:00+03:00"
+      },
+      "statement": {
+        "owner_employee_id": "e-sokolov",
+        "due_at": "2026-11-12T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "chat-support",
+        "external_id": "s4",
+        "document_id": "chat-support:2026-11-11"
+      },
+      "quote": "Беру t-crm-refresh на себя"
+    },
+    {
+      "id": "new-director-matrix",
+      "type": "commitment",
+      "task_id": null,
+      "statement": {
+        "owner_employee_id": "e-sokolov",
+        "due_at": "2026-11-12T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "mail-director",
+        "external_id": "v2-routing-promise@fotoprint.test",
+        "document_id": "mail-director:2bff6480b04d"
+      },
+      "quote": "матрицу коммуникаций по карантинным партиям подготовлю"
+    },
+    {
+      "id": "new-backup-contacts",
+      "type": "commitment",
+      "task_id": null,
+      "statement": {
+        "owner_employee_id": "e-petrova",
+        "due_at": "2026-11-12T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "mail-petrova",
+        "external_id": "v2-backup-contacts@fotoprint.test",
+        "document_id": "mail-petrova:0af0b167c64e"
+      },
+      "quote": "список резервных контактов поставщиков бумаги подготовлю"
+    },
+    {
+      "id": "new-availability-table",
+      "type": "commitment",
+      "task_id": null,
+      "statement": {
+        "owner_employee_id": "e-petrova",
+        "due_at": "2026-11-12T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "tg-procurement",
+        "external_id": "1002/4",
+        "document_id": "tg-procurement:2026-11-11"
+      },
+      "quote": "подготовлю сравнительную таблицу доступности бумаги"
+    },
+    {
+      "id": "new-complaint-matrix",
+      "type": "commitment",
+      "task_id": null,
+      "statement": {
+        "owner_employee_id": "e-belov",
+        "due_at": "2026-11-12T18:00:00+03:00"
+      },
+      "source": {
+        "channel_id": "tg-coordination",
+        "external_id": "1003/3",
+        "document_id": "tg-coordination:2026-11-11"
+      },
+      "quote": "Матрицу маршрутизации рекламаций по расслоению фотокниг подготовлю"
+    }
+  ]
+}

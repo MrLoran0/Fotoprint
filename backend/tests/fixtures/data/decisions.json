@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dec-incoming-control-1104",
+    "title": "Брак фотокниг 4,1% в октябре при плане 2%",
+    "metric_id": "defect_rate",
+    "impact": "41 из 1000 проверенных фотокниг с браком; сверх плана ≈21 изделие за октябрь",
+    "cause_hypothesis": "Рост совпал по времени с переходом на бумагу «БелЛист» (партия Б-1012) и перенастройкой линии; причинная связь не доказана — нужны сравнительные испытания.",
+    "cause_sources": [],
+    "action_text": "Вернуть входной контроль каждой партии бумаги с 05.11 и провести сравнительные испытания",
+    "owner_employee_id": "e-kozlova",
+    "due_at": "2026-11-10T18:00:00+03:00",
+    "priority": "high",
+    "status": "in_progress",
+    "baseline": {
+      "value": 4.1,
+      "numerator": 41,
+      "denominator": 1000,
+      "period": "10.2026",
+      "start": "2026-10-01",
+      "end": "2026-10-31",
+      "plan": 2.0,
+      "unit": "%",
+      "computed_at": "2026-11-04T10:15:00+03:00"
+    },
+    "recheck": null,
+    "task_ids": [
+      "t-incoming-control-1104"
+    ],
+    "department_id": "production",
+    "created_by": "u-morozov",
+    "created_at": "2026-11-04T10:15:00+03:00",
+    "effective_from": "2026-11-05T00:00:00+03:00",
+    "history": [
+      {
+        "at": "2026-11-04T10:15:00+03:00",
+        "user_id": "u-morozov",
+        "event": "создано",
+        "detail": "по итогам оперативки 04.11"
+      }
+    ]
+  }
+]

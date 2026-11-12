@@ -1,0 +1,209 @@
+[
+  {
+    "id": "prod-photobook",
+    "type": "product",
+    "name": "Фотокнига",
+    "aliases": [
+      "фотокниги",
+      "фотокниг"
+    ]
+  },
+  {
+    "id": "sup-a",
+    "type": "supplier",
+    "name": "АльфаБумага",
+    "aliases": [
+      "поставщик А",
+      "поставщика А"
+    ]
+  },
+  {
+    "id": "sup-b",
+    "type": "supplier",
+    "name": "БелЛист",
+    "aliases": [
+      "поставщик Б",
+      "поставщика Б"
+    ]
+  },
+  {
+    "id": "batch-b1012",
+    "type": "topic",
+    "name": "Б-1012",
+    "aliases": []
+  },
+  {
+    "id": "batch-b1102",
+    "type": "topic",
+    "name": "Б-1102",
+    "aliases": []
+  },
+  {
+    "id": "batch-a1001",
+    "type": "topic",
+    "name": "А-1001",
+    "aliases": []
+  },
+  {
+    "id": "eq-binding-1",
+    "type": "equipment",
+    "name": "Переплётная линия №1",
+    "aliases": [
+      "переплётная линия",
+      "переплётной линии"
+    ]
+  },
+  {
+    "id": "topic-incoming-control",
+    "type": "topic",
+    "name": "Входной контроль",
+    "aliases": [
+      "входной контроль",
+      "входного контроля"
+    ]
+  },
+  {
+    "id": "topic-trials",
+    "type": "topic",
+    "name": "Испытания бумаги",
+    "aliases": [
+      "испытания",
+      "сравнительные испытания"
+    ]
+  },
+  {
+    "id": "topic-certificates",
+    "type": "topic",
+    "name": "Сертификаты",
+    "aliases": [
+      "сертификат"
+    ]
+  },
+  {
+    "id": "prod-photobook-20",
+    "type": "product",
+    "name": "Фотокнига 20x20",
+    "aliases": [
+      "фотокниги 20x20"
+    ]
+  },
+  {
+    "id": "prod-photobook-30",
+    "type": "product",
+    "name": "Фотокнига 30x30",
+    "aliases": [
+      "фотокниги 30x30"
+    ]
+  },
+  {
+    "id": "prod-postcards",
+    "type": "product",
+    "name": "Набор фотооткрыток",
+    "aliases": [
+      "фотооткрытки"
+    ]
+  },
+  {
+    "id": "tech-card-20-01",
+    "type": "topic",
+    "name": "ТК-20-01",
+    "aliases": [
+      "техкарта ТК-20-01"
+    ]
+  },
+  {
+    "id": "topic-delamination",
+    "type": "topic",
+    "name": "Расслоение разворотов",
+    "aliases": [
+      "расслоение",
+      "расслоению"
+    ]
+  },
+  {
+    "id": "topic-print-shift",
+    "type": "topic",
+    "name": "Смещение печати",
+    "aliases": [
+      "смещение изображения"
+    ]
+  },
+  {
+    "id": "topic-quarantine",
+    "type": "topic",
+    "name": "Карантин бумаги",
+    "aliases": [
+      "карантин",
+      "карантине"
+    ]
+  },
+  {
+    "id": "topic-stock",
+    "type": "topic",
+    "name": "Остатки бумаги",
+    "aliases": [
+      "остаток бумаги",
+      "складские остатки"
+    ]
+  },
+  {
+    "id": "topic-client-template",
+    "type": "topic",
+    "name": "Шаблон ответа при задержке",
+    "aliases": [
+      "шаблон ответа",
+      "t-client-template-1109"
+    ]
+  },
+  {
+    "id": "topic-crm-refresh",
+    "type": "topic",
+    "name": "Восстановление выгрузки CRM",
+    "aliases": [
+      "выгрузка CRM",
+      "t-crm-refresh"
+    ]
+  },
+  {
+    "id": "topic-sla",
+    "type": "topic",
+    "name": "SLA первого ответа",
+    "aliases": [
+      "SLA поддержки",
+      "срок первого ответа"
+    ]
+  },
+  {
+    "id": "topic-client-routing",
+    "type": "topic",
+    "name": "Матрица коммуникаций по карантинным партиям",
+    "aliases": [
+      "матрица коммуникаций"
+    ]
+  },
+  {
+    "id": "topic-complaint-routing",
+    "type": "topic",
+    "name": "Матрица маршрутизации рекламаций",
+    "aliases": [
+      "маршрутизация рекламаций"
+    ]
+  },
+  {
+    "id": "topic-backup-contacts",
+    "type": "topic",
+    "name": "Резервные контакты поставщиков",
+    "aliases": [
+      "список резервных контактов"
+    ]
+  },
+  {
+    "id": "topic-order-deadlines",
+    "type": "topic",
+    "name": "Обещанные сроки заказов",
+    "aliases": [
+      "срок заказа",
+      "даты заказов"
+    ]
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "prod-photobook",
+    "type": "product",
+    "name": "Фотокнига",
+    "aliases": [
+      "фотокниги",
+      "фотокниг"
+    ]
+  },
+  {
+    "id": "sup-a",
+    "type": "supplier",
+    "name": "АльфаБумага",
+    "aliases": [
+      "поставщик А",
+      "поставщика А"
+    ]
+  },
+  {
+    "id": "sup-b",
+    "type": "supplier",
+    "name": "БелЛист",
+    "aliases": [
+      "поставщик Б",
+      "поставщика Б"
+    ]
+  },
+  {
+    "id": "batch-b1012",
+    "type": "topic",
+    "name": "Б-1012",
+    "aliases": []
+  },
+  {
+    "id": "batch-b1102",
+    "type": "topic",
+    "name": "Б-1102",
+    "aliases": []
+  },
+  {
+    "id": "batch-a1001",
+    "type": "topic",
+    "name": "А-1001",
+    "aliases": []
+  },
+  {
+    "id": "eq-binding-1",
+    "type": "equipment",
+    "name": "Переплётная линия №1",
+    "aliases": [
+      "переплётная линия",
+      "переплётной линии"
+    ]
+  },
+  {
+    "id": "topic-incoming-control",
+    "type": "topic",
+    "name": "Входной контроль",
+    "aliases": [
+      "входной контроль",
+      "входного контроля"
+    ]
+  },
+  {
+    "id": "topic-trials",
+    "type": "topic",
+    "name": "Испытания бумаги",
+    "aliases": [
+      "испытания",
+      "сравнительные испытания"
+    ]
+  },
+  {
+    "id": "topic-certificates",
+    "type": "topic",
+    "name": "Сертификаты",
+    "aliases": [
+      "сертификат"
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ev-planning-1112",
+    "title": "Планирование выпуска на неделю",
+    "starts_at": "2026-11-12T09:30:00+03:00", "ends_at": "2026-11-12T10:30:00+03:00",
+    "timezone": "Europe/Minsk", "attendee_ids": ["e-morozov", "e-volkov"], "source": "seed"
+  },
+  {
+    "id": "ev-supplier-1112",
+    "title": "Звонок с поставщиком бумаги",
+    "starts_at": "2026-11-12T14:00:00+03:00", "ends_at": "2026-11-12T14:30:00+03:00",
+    "timezone": "Europe/Minsk", "attendee_ids": ["e-petrova"], "source": "seed"
+  }
+]

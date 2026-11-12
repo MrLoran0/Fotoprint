@@ -1,0 +1,29 @@
+[
+  {
+    "id": "t-trials-1104",
+    "title": "Провести испытания бумаги двух поставщиков на одной настройке линии",
+    "expected_result": "Отчёт об испытаниях с долей брака по каждой бумаге",
+    "owner_employee_id": "e-volkov", "owner_origin": "explicit",
+    "due_at": "2026-11-07T18:00:00+03:00", "due_origin": "explicit",
+    "status": "in_progress",
+    "department_id": "production", "meeting_id": "m-quality-1104"
+  },
+  {
+    "id": "t-incoming-control-1104",
+    "title": "Вернуть входной контроль каждой партии бумаги",
+    "expected_result": "Журнал входного контроля по каждой партии",
+    "owner_employee_id": "e-kozlova", "owner_origin": "explicit",
+    "due_at": "2026-11-05T18:00:00+03:00", "due_origin": "suggested",
+    "status": "done", "result": "Входной контроль введён с 05.11, журнал ведётся",
+    "completed_at": "2026-11-05T16:20:00+03:00",
+    "department_id": "production", "meeting_id": "m-quality-1104"
+  },
+  {
+    "id": "t-certificates-1104",
+    "title": "Запросить у поставщика сертификаты на партию бумаги",
+    "owner_employee_id": null, "owner_origin": "unknown",
+    "due_at": null, "due_origin": "unknown",
+    "status": "assigned",
+    "department_id": "production", "meeting_id": "m-quality-1104"
+  }
+]

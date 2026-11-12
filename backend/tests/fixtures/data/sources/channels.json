@@ -1,0 +1,39 @@
+[
+  {
+    "id": "tg-production",
+    "kind": "telegram",
+    "name": "Telegram: Производство — оперативный",
+    "connector": "telegram_export",
+    "path": "telegram/production/result.json",
+    "access_level": "participants",
+    "department_id": "production",
+    "member_ids": [
+      "e-morozov",
+      "e-petrova",
+      "e-volkov",
+      "e-kozlova"
+    ]
+  },
+  {
+    "id": "mail-morozov",
+    "kind": "email",
+    "name": "Почта: i.morozov@fotoprint.test",
+    "connector": "email_eml",
+    "path": "email/morozov",
+    "access_level": "participants",
+    "department_id": "production",
+    "member_ids": [
+      "e-morozov"
+    ]
+  },
+  {
+    "id": "chat-quality",
+    "kind": "chat",
+    "name": "Чат «Качество»",
+    "connector": "chat_json",
+    "path": "chat/quality.json",
+    "access_level": "department",
+    "department_id": "production",
+    "member_ids": []
+  }
+]

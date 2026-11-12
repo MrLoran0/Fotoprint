@@ -1,0 +1,15 @@
+[
+  {
+    "id": "m-quality-1104",
+    "title": "Оперативка по качеству фотокниг",
+    "topic": "Рост брака фотокниг после смены бумаги",
+    "starts_at": "2026-11-04T10:00:00+03:00",
+    "ends_at": "2026-11-04T10:45:00+03:00",
+    "timezone": "Europe/Minsk",
+    "organizer_user_id": "u-morozov",
+    "department_id": "production",
+    "participant_ids": ["e-morozov", "e-petrova", "e-volkov", "e-kozlova"],
+    "status": "held",
+    "transcript_file": "sample-quality-1104.txt"
+  }
+]

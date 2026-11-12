@@ -1,0 +1,105 @@
+[
+  {
+    "id": "tg-production",
+    "kind": "telegram",
+    "name": "Telegram: Производство — оперативный",
+    "connector": "telegram_export",
+    "path": "telegram/production/result.json",
+    "access_level": "participants",
+    "department_id": "production",
+    "member_ids": [
+      "e-morozov",
+      "e-petrova",
+      "e-volkov",
+      "e-kozlova"
+    ]
+  },
+  {
+    "id": "mail-morozov",
+    "kind": "email",
+    "name": "Почта: i.morozov@fotoprint.test",
+    "connector": "email_eml",
+    "path": "email/morozov",
+    "access_level": "participants",
+    "department_id": "production",
+    "member_ids": [
+      "e-morozov"
+    ]
+  },
+  {
+    "id": "chat-quality",
+    "kind": "chat",
+    "name": "Чат «Качество»",
+    "connector": "chat_json",
+    "path": "chat/quality.json",
+    "access_level": "department",
+    "department_id": "production",
+    "member_ids": []
+  },
+  {
+    "id": "mail-director",
+    "kind": "email",
+    "name": "Почта: a.smirnova@fotoprint.test",
+    "connector": "email_eml",
+    "path": "email/director",
+    "access_level": "participants",
+    "department_id": "management",
+    "member_ids": [
+      "e-smirnova"
+    ]
+  },
+  {
+    "id": "mail-petrova",
+    "kind": "email",
+    "name": "Почта: m.petrova@fotoprint.test",
+    "connector": "email_eml",
+    "path": "email/petrova",
+    "access_level": "participants",
+    "department_id": "production",
+    "member_ids": [
+      "e-petrova"
+    ]
+  },
+  {
+    "id": "tg-procurement",
+    "kind": "telegram",
+    "name": "Telegram: Закупки и технология",
+    "connector": "telegram_export",
+    "path": "telegram/procurement/result.json",
+    "access_level": "participants",
+    "department_id": "production",
+    "member_ids": [
+      "e-petrova",
+      "e-volkov"
+    ]
+  },
+  {
+    "id": "tg-coordination",
+    "kind": "telegram",
+    "name": "Telegram: Координация клиентских сроков",
+    "connector": "telegram_export",
+    "path": "telegram/coordination/result.json",
+    "access_level": "participants",
+    "department_id": "management",
+    "member_ids": [
+      "e-smirnova",
+      "e-morozov",
+      "e-belov",
+      "e-sokolov"
+    ]
+  },
+  {
+    "id": "chat-support",
+    "kind": "chat",
+    "name": "Чат: Поддержка и сроки заказов",
+    "connector": "chat_json",
+    "path": "chat/support.json",
+    "access_level": "participants",
+    "department_id": "support",
+    "member_ids": [
+      "e-morozov",
+      "e-belov",
+      "e-sokolov"
+    ]
+  }
+]

@@ -1,0 +1,111 @@
+{
+  "transcript": "quality-1109.txt",
+  "meeting_id": "m-quality-1109",
+  "split": "development",
+  "timezone": "Europe/Minsk",
+  "relative_due_rule": "От даты встречи, 18:00 при отсутствии времени; вычисляет код.",
+  "items": [
+    {
+      "kind": "discussion",
+      "statement": "Испытания не завершены; срок 06.11 пропущен",
+      "segment_id": 2,
+      "evidence_quote": "Обсуждение: обе бумаги сравниваем на одной настройке, но итоговый отчёт не готов. Старый срок до 06.11 пропущен.",
+      "decision_status": "discussed"
+    },
+    {
+      "kind": "proposal",
+      "statement": "Оплатить срочную доставку бумаги АльфаБумага",
+      "segment_id": 3,
+      "evidence_quote": "Предлагаю оплатить срочную доставку бумаги «АльфаБумага».",
+      "decision_status": "proposed",
+      "context_segment_ids": [
+        4
+      ]
+    },
+    {
+      "kind": "decision",
+      "statement": "Оставить Б-1102 в карантине до получения сертификата",
+      "segment_id": 5,
+      "evidence_quote": "Решили оставить партию Б-1102 в карантине до получения сертификата.",
+      "decision_status": "decided"
+    },
+    {
+      "kind": "task",
+      "statement": "Получить сертификат Б-1012",
+      "segment_id": 6,
+      "evidence_quote": "Маша, получи сертификат партии Б-1012 до 10.11.2026. Результат — файл сертификата в журнале закупок.",
+      "decision_status": null,
+      "owner": "e-petrova",
+      "owner_raw": "Маша",
+      "owner_origin": "explicit",
+      "due": "2026-11-10",
+      "due_at": "2026-11-10T18:00:00+03:00",
+      "due_raw": "до 10.11.2026",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Подготовить шаблон ответа клиенту при задержке",
+      "segment_id": 8,
+      "evidence_quote": "Олег, подготовь шаблон ответа клиенту при задержке из-за проверки бумаги до завтра. Результат — согласованный текст без обещания неподтверждённого срока.",
+      "decision_status": null,
+      "owner": "e-belov",
+      "owner_raw": "Олег",
+      "owner_origin": "explicit",
+      "due": "2026-11-10",
+      "due_at": "2026-11-10T18:00:00+03:00",
+      "due_raw": "до завтра",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Сверить остаток Б-1102",
+      "segment_id": 10,
+      "evidence_quote": "Нужно сверить остаток бумаги Б-1102 до 10.11.2026. Кто возьмёт задачу, ещё не определили.",
+      "decision_status": null,
+      "owner": null,
+      "owner_raw": null,
+      "owner_origin": "unknown",
+      "due": "2026-11-10",
+      "due_at": "2026-11-10T18:00:00+03:00",
+      "due_raw": "до 10.11.2026",
+      "due_origin": "explicit",
+      "needs_clarification": [
+        "owner_employee_id"
+      ]
+    },
+    {
+      "kind": "task",
+      "statement": "Подготовить перечень заказов под риском задержки",
+      "segment_id": 11,
+      "evidence_quote": "Рома, подготовь перечень заказов, которым угрожает задержка. Срок пока не задаём.",
+      "decision_status": null,
+      "owner": "e-sokolov",
+      "owner_raw": "Рома",
+      "owner_origin": "explicit",
+      "due": null,
+      "due_at": null,
+      "due_raw": null,
+      "due_origin": "unknown",
+      "needs_clarification": [
+        "due_at"
+      ]
+    },
+    {
+      "kind": "question",
+      "statement": "Можно ли использовать А-1001, пока Б-1102 в карантине?",
+      "segment_id": 13,
+      "evidence_quote": "Вопрос: можно ли использовать остаток А-1001, пока Б-1102 в карантине?",
+      "decision_status": "needs_clarification"
+    },
+    {
+      "kind": "risk",
+      "statement": "Снятие карантина без сертификата допустит непроверенную бумагу",
+      "segment_id": 14,
+      "evidence_quote": "Риск: снятие карантина без сертификата приведёт к повторному выпуску с непроверенной бумагой.",
+      "decision_status": "discussed"
+    }
+  ]
+}

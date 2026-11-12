@@ -1,0 +1,5 @@
+[
+  {"id": "qc-1001", "checked_on": "2026-10-06", "product": "Фотокнига 20x20", "line": "Переплётная №1", "paper_supplier": "Поставщик А", "checked_units": 400, "defective_units": 7},
+  {"id": "qc-1002", "checked_on": "2026-10-20", "product": "Фотокнига 20x20", "line": "Переплётная №1", "paper_supplier": "Поставщик Б", "checked_units": 420, "defective_units": 18},
+  {"id": "qc-1003", "checked_on": "2026-11-06", "product": "Фотокнига 20x20", "line": "Переплётная №1", "paper_supplier": "Поставщик Б", "checked_units": 380, "defective_units": 13}
+]

@@ -1,0 +1,112 @@
+{
+  "transcript": "quality-1104.txt",
+  "meeting_id": "m-quality-1104",
+  "split": "development",
+  "timezone": "Europe/Minsk",
+  "relative_due_rule": "От даты встречи, 18:00 при отсутствии времени; вычисляет код.",
+  "items": [
+    {
+      "kind": "discussion",
+      "statement": "Влияние бумаги не доказано: одновременно меняли настройки",
+      "segment_id": 2,
+      "evidence_quote": "Обсудим причины. Одновременно сменили бумагу и настройки линии, поэтому влияние бумаги пока не доказано.",
+      "decision_status": "discussed"
+    },
+    {
+      "kind": "proposal",
+      "statement": "Полностью вернуться к АльфаБумаге",
+      "segment_id": 3,
+      "evidence_quote": "Предлагаю полностью вернуться к «АльфаБумаге».",
+      "decision_status": "proposed",
+      "context_segment_ids": [
+        4,
+        15
+      ]
+    },
+    {
+      "kind": "decision",
+      "statement": "Вернуть входной контроль каждой партии с 05.11.2026",
+      "segment_id": 5,
+      "evidence_quote": "Решили вернуть входной контроль каждой партии бумаги с 05.11.2026.",
+      "decision_status": "decided"
+    },
+    {
+      "kind": "task",
+      "statement": "Ввести журнал входного контроля",
+      "segment_id": 6,
+      "evidence_quote": "Лена, введи журнал входного контроля до 05.11.2026. Результат — журнал с отметкой по каждой партии.",
+      "decision_status": null,
+      "owner": "e-kozlova",
+      "owner_raw": "Лена",
+      "owner_origin": "explicit",
+      "due": "2026-11-05",
+      "due_at": "2026-11-05T18:00:00+03:00",
+      "due_raw": "до 05.11.2026",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Провести испытания бумаги двух поставщиков на одной настройке",
+      "segment_id": 8,
+      "evidence_quote": "Дима, проведи испытания бумаги двух поставщиков на одной настройке до пятницы. Результат — сравнительный отчёт по дефектам.",
+      "decision_status": null,
+      "owner": "e-volkov",
+      "owner_raw": "Дима",
+      "owner_origin": "explicit",
+      "due": "2026-11-06",
+      "due_at": "2026-11-06T18:00:00+03:00",
+      "due_raw": "до пятницы",
+      "due_origin": "explicit",
+      "needs_clarification": []
+    },
+    {
+      "kind": "task",
+      "statement": "Запросить сертификаты Б-1012 и Б-1102",
+      "segment_id": 10,
+      "evidence_quote": "Нужно запросить сертификаты на партии Б-1012 и Б-1102 до 06.11.2026. Ответственного пока не назначаем.",
+      "decision_status": null,
+      "owner": null,
+      "owner_raw": null,
+      "owner_origin": "unknown",
+      "due": "2026-11-06",
+      "due_at": "2026-11-06T18:00:00+03:00",
+      "due_raw": "до 06.11.2026",
+      "due_origin": "explicit",
+      "needs_clarification": [
+        "owner_employee_id"
+      ]
+    },
+    {
+      "kind": "task",
+      "statement": "Составить карту текущих настроек переплётной линии",
+      "segment_id": 11,
+      "evidence_quote": "Паша, составь карту текущих настроек переплётной линии. Срок пока не определяем.",
+      "decision_status": null,
+      "owner": "e-zaitsev",
+      "owner_raw": "Паша",
+      "owner_origin": "explicit",
+      "due": null,
+      "due_at": null,
+      "due_raw": null,
+      "due_origin": "unknown",
+      "needs_clarification": [
+        "due_at"
+      ]
+    },
+    {
+      "kind": "question",
+      "statement": "Выдаёт ли БелЛист сертификат на каждую партию?",
+      "segment_id": 13,
+      "evidence_quote": "Вопрос: выдаёт ли «БелЛист» сертификат отдельно на каждую партию?",
+      "decision_status": "needs_clarification"
+    },
+    {
+      "kind": "risk",
+      "statement": "Без сертификата партия попадёт в карантин и задержит выпуск",
+      "segment_id": 14,
+      "evidence_quote": "Риск: без сертификата новая партия попадёт в карантин и задержит выпуск.",
+      "decision_status": "discussed"
+    }
+  ]
+}

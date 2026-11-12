@@ -1,0 +1,50 @@
+.print-document { display: none }
+
+@page { size: A4 portrait; margin: 15mm 17mm }
+
+@media print {
+  body:has(> .print-document) > :not(.print-document) { display: none !important }
+
+  body:has(> .print-document) {
+    color-scheme: light;
+    background: #fff;
+  }
+
+  .print-document {
+    display: block;
+    color-scheme: light;
+    color: #172334;
+    background: #fff;
+    font: 10.5pt/1.45 Manrope, 'Segoe UI', sans-serif;
+    overflow-wrap: anywhere;
+  }
+
+  .print-header {
+    border-bottom: 1pt solid #708096;
+    padding-bottom: 3mm;
+    margin-bottom: 6mm;
+    font-weight: 750;
+  }
+
+  .print-document h1, .print-document h2 { break-after: avoid; letter-spacing: normal }
+  .print-document h1 { font-size: 19pt; margin: 0 0 4mm }
+  .print-document h2 { font-size: 13pt; margin: 5mm 0 2mm }
+  .print-document p, .print-document ul, .print-document ol { margin: 0 0 3mm }
+  .print-document ul, .print-document ol { padding-inline-start: 6mm }
+  .print-document li { margin-bottom: 1.8mm }
+  .print-document li, .print-document tr { break-inside: avoid }
+  .print-document blockquote { margin: 1mm 0 0; color: #38495e }
+  .print-document dl { margin: 0 0 3mm }
+  .print-document dt { font-weight: 750; break-after: avoid }
+  .print-document dd { margin: 0 0 2mm }
+  .print-document table { min-width: 0; font-size: inherit }
+  .print-document th, .print-document td {
+    font-size: inherit;
+    color: inherit;
+    padding: 1.5mm 2mm;
+    border-bottom: 0.5pt solid #b8c4d0;
+    vertical-align: top;
+  }
+  .print-document th { text-transform: none; letter-spacing: normal }
+  .print-sources { margin-top: 5mm; border-top: 0.5pt solid #b8c4d0 }
+}

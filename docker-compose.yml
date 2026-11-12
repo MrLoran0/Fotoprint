@@ -1,0 +1,126 @@
+name: fokus
+
+# Запуск:
+#   docker compose up -d --build                  — модель по API (Gemini) или локальный сервер в контуре (LLM_PROVIDER=local)
+#   docker compose --profile gpu up -d --build    — плюс Ollama на NVIDIA GPU (проверка локальной модели), модели скачаются сами
+
+x-api-env: &api-env
+  DATABASE_URL: postgresql+psycopg://fokus:fokus@db:5432/fokus
+  JWT_SECRET: ${JWT_SECRET:-}
+  DEMO_PASSWORD: ${DEMO_PASSWORD:-fokus-demo}
+  LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+  LOCAL_BASE_URL: ${LOCAL_BASE_URL:-http://host.docker.internal:8001/v1}
+  LOCAL_API_KEY: ${LOCAL_API_KEY:-}
+  LOCAL_MODEL: ${LOCAL_MODEL:-}
+  LLM_MODEL: ${LLM_MODEL:-qwen3:8b}
+  EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+  OLLAMA_NUM_CTX: ${OLLAMA_NUM_CTX:-8192}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+  GEMINI_BASE_URL: ${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai}
+  SMTP_HOST: mailpit
+  SMTP_PORT: "1025"
+  COMPANY_TZ: ${COMPANY_TZ:-Europe/Minsk}
+  SCENARIO_NOW: ${SCENARIO_NOW:-}
+  DATA_DIR: /data
+  SEED_ON_START: "true"
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: fokus
+      POSTGRES_PASSWORD: fokus
+      POSTGRES_DB: fokus
+    ports:
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./backend/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fokus -d fokus"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build: ./backend
+    environment: *api-env
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./data:/data:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_DEMO_PASSWORD: ${DEMO_PASSWORD:-fokus-demo}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    environment:
+      MP_MAX_MESSAGES: "5000"
+
+  # --- Локальная LLM на GPU (профиль gpu) ---
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["gpu"]
+    ports:
+      # 0.0.0.0 — чтобы ноутбуки команды могли ходить к модели по локальной сети
+      - "0.0.0.0:11434:11434"
+    environment:
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
+      OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_NUM_CTX:-8192}
+      OLLAMA_MAX_LOADED_MODELS: "2"
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  ollama-init:
+    image: ollama/ollama:latest
+    profiles: ["gpu"]
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - "ollama pull ${LLM_MODEL:-qwen3:8b} && ollama pull ${EMBED_MODEL:-bge-m3} && echo 'models ready'"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  db-data:
+  ollama-models:
