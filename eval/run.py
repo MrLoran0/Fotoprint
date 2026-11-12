@@ -180,7 +180,7 @@ class Runner:
 def write_report(path, result):
     fake = result['provider'] == 'fake'
     label = 'ТЕХНИЧЕСКИЙ ПРОГОН fake — НЕ качество AI' if fake else 'Оценка ответов модели на синтетическом наборе'
-    lines = ['# Оценка качества AI-ассистента', '', label, '',
+    lines = ['# Eval «Фокус»', '', label, '',
              f"Дата UTC: {result['created_at']}. Commit: `{result['commit']}`.",
              f"Provider: `{result['provider']}`; model: `{result['health']['llm']['model']}`; route: `{result['health']['llm']['route']}`.",
              f"Время сценария: `{result['health']['scenario_now']}`. Последовательный прогон; повторов нет.", '',
@@ -235,7 +235,7 @@ def write_report(path, result):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--provider', required=True, choices=['fake', 'ollama', 'gemini', 'local'])
+    parser.add_argument('--provider', required=True, choices=['fake', 'ollama', 'gemini', 'openai', 'anthropic', 'local'])
     parser.add_argument('--base-url', default=os.getenv('EVAL_BASE_URL', 'http://127.0.0.1:8000'))
     parser.add_argument('--cases-dir', type=Path, default=Path(__file__).resolve().parent)
     parser.add_argument('--data-dir', type=Path, default=Path(os.getenv('DATA_DIR', str(Path(__file__).resolve().parents[1]/'data'))))
