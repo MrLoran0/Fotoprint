@@ -484,3 +484,18 @@ def test_health_reports_smtp(client, monkeypatch):
     monkeypatch.setattr("app.routers.system._smtp_ok", down)
     h = client.get("/health").json()
     assert h["smtp"] is False and h["status"] == "degraded"
+
+
+def test_delegation_suggests_standard_due_when_sources_have_none(client):
+    """§7.2.4: срока нет ни в поручении, ни в переписке — код предлагает 3 рабочих дня и честно пишет почему."""
+    from app.delegation import default_due
+    _new_task("t-deleg-nodue", "Обновить карту настроек переплётной линии")
+    r = client.post("/delegation/propose", json={"task_id": "t-deleg-nodue"}, headers=login(client, "morozov"))
+    assert r.status_code == 200, r.text
+    p = r.json()["payload"]
+    due = datetime.fromisoformat(p["due_at"])
+    assert due == default_due(get_settings().now()) and due.weekday() < 5 and (due.hour, due.minute) == (18, 0)
+    assert "не найден" in p["reason"] and "стандартный" in p["reason"]
+    # пятница вечером → среда (выходные пропускаются)
+    friday = datetime.fromisoformat("2026-11-13T17:00:00+03:00")
+    assert default_due(friday).date().isoformat() == "2026-11-18"

@@ -5,6 +5,8 @@
 | `LLM_PROVIDER` | Что это | Когда |
 |---|---|---|
 | `gemini` | внешний API, `route: external` | **демо по умолчанию**: умная локальная модель не помещается на ноутбуки команды |
+| `openai` | внешний API OpenAI (GPT), `route: external` | ключ `OPENAI_API_KEY`, модель `OPENAI_MODEL` |
+| `anthropic` | внешний API Anthropic (Claude), `route: external` | ключ `ANTHROPIC_API_KEY`, модель `ANTHROPIC_MODEL` |
 | `local` | любой OpenAI‑совместимый сервер в контуре компании (vLLM, TGI, LM Studio), `route: local` | **пилот**: модель на GPU заказчика; меняются только `LOCAL_BASE_URL` и `LOCAL_MODEL` |
 | `ollama` | Ollama, `route: local` | проверка локальной модели на ноутбуке с GPU |
 | `fake` | dev‑заглушка без ИИ | только разработка |

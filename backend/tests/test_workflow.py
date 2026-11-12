@@ -629,3 +629,43 @@ def test_protocol_timeout_returns_503_and_keeps_uploaded_transcript(client, monk
     assert "не ответила вовремя" in response.json()["detail"] and "Расшифровка сохранена" in response.json()["detail"]
     rows = client.get("/meetings/m-quality-1104/transcripts", headers=headers).json()
     assert rows[0]["text"] == timeout_text
+
+
+def test_editor_adds_missing_item_changes_kind_and_summary_then_publishes(client, gateway):
+    """AI-07: человек добавляет пропущенный пункт к реплике, меняет тип/статус, правит summary — и это публикуется."""
+    headers = login(client, "morozov")
+    response = client.post("/meetings/m-quality-1104/transcript", json={"text": TEXT}, headers=headers)
+    draft = response.json()
+    first, seg = draft["items"][0], draft["segments"][-1]
+    response = client.patch(f"/drafts/{draft['id']}", headers=headers, json={
+        "revision": draft["revision"], "summary": "Итоги: входной контроль и испытания бумаги",
+        "items": [{"id": first["id"], "kind": "risk", "decision_status": "discussed"}],
+        "new_items": [{"kind": "task", "statement": "Подготовить сравнительный отчёт", "segment_id": seg["n"]}]})
+    assert response.status_code == 200, response.text
+    out = response.json()
+    assert out["summary"] == "Итоги: входной контроль и испытания бумаги" and out["revision"] == draft["revision"] + 1
+    edited = next(i for i in out["items"] if i["id"] == first["id"])
+    assert (edited["kind"], edited["decision_status"]) == ("risk", "discussed")
+    added = out["items"][-1]
+    assert added["statement"] == "Подготовить сравнительный отчёт" and added["evidence_quote"] == seg["text"]
+    assert added["quote_verified"] and set(added["needs_clarification"]) == {"owner_employee_id", "due_at"}
+    # несуществующая реплика — не основание
+    bad = client.patch(f"/drafts/{draft['id']}", headers=headers, json={
+        "revision": out["revision"], "new_items": [{"kind": "task", "statement": "x", "segment_id": 999}]})
+    assert bad.status_code == 422
+    card = client.post(f"/drafts/{draft['id']}/proposals", headers=headers).json()[0]
+    assert client.post(f"/actions/{card['id']}/confirm", json=confirmation(card), headers=headers).status_code == 200
+
+
+def test_feedback_only_for_what_user_has_seen(client, gateway):
+    headers = login(client, "morozov")
+    draft = client.post("/meetings/m-quality-1104/transcript", json={"text": TEXT}, headers=headers).json()
+    ok = client.post("/feedback", headers=headers, json={"target_type": "protocol", "target_id": draft["id"], "rating": -1,
+                                                        "comment": "пропущена задача про сертификаты"})
+    assert ok.status_code == 200, ok.text and ok.json()["rating"] == -1
+    item = client.post("/feedback", headers=headers, json={"target_type": "protocol_item",
+                                                          "target_id": draft["items"][0]["id"], "rating": 1})
+    assert item.status_code == 200
+    # чужой/несуществующий ответ ассистента оценить нельзя
+    assert client.post("/feedback", headers=headers, json={"target_type": "answer", "target_id": "999999", "rating": 1}).status_code == 404
+    assert client.post("/feedback", headers=headers, json={"target_type": "protocol", "target_id": "nope", "rating": 1}).status_code in (403, 404)

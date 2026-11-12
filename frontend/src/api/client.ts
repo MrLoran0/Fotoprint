@@ -55,8 +55,14 @@ export async function login(login: string, password: string) {
   return result.user
 }
 
+/** Черновики ввода живут в браузере — при выходе и смене роли их не оставляем (общий компьютер). */
+export function clearDrafts() {
+  for (const key of Object.keys(sessionStorage)) if (key.startsWith('fokus-draft:')) sessionStorage.removeItem(key)
+}
+
 export function logout() {
   sessionStorage.removeItem(tokenKey)
+  clearDrafts()
 }
 
 export const id = encodeURIComponent

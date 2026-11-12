@@ -154,7 +154,28 @@ def test_graph_rejects_unknown_focus_and_hidden_task(client):
     assert client.get("/graph", params={"focus": "task:does-not-exist"}, headers=h).status_code == 403
 
 
-@pytest.mark.parametrize("provider,route", [("gemini", "external"), ("local", "local"), ("ollama", "local"), ("fake", "local")])
+@pytest.mark.parametrize("provider,route", [("gemini", "external"), ("openai", "external"), ("anthropic", "external"),
+                                            ("local", "local"), ("ollama", "local"), ("fake", "local")])
 def test_route_is_honest_for_every_provider(provider, route):
     gw = LLMGateway(get_settings().model_copy(update={"llm_provider": provider, "local_model": "qwen-72b"}))
     assert gw.route == route and gw.model
+
+
+def test_experts_ignore_ai_forbidden_documents():
+    """AI-02: подсказка «кто может знать» — вывод ИИ; документы с ai_allowed=false в неё не попадают."""
+    from datetime import date
+    from app.graph.experts import suggest_experts
+    from app.graph.mentions import index_chunks
+    from app.models import Document, User
+
+    with SessionLocal() as db:
+        doc = Document(id="hr-closed-beliist", title="Закрытая записка", doc_date=date(2026, 11, 10), access_level="public",
+                       ai_allowed=False, content="БелЛист")
+        doc.chunks = [DocumentChunk(id=f"hr-closed-beliist#{i}", ordinal=i, text=f"Про БелЛист, заметка {i}",
+                                    author_employee_id="e-belov") for i in range(5)]
+        db.add(doc)
+        db.flush()
+        index_chunks(db, doc.chunks)
+        db.commit()
+        experts = suggest_experts(db, db.get(User, "u-director"), "Что известно о БелЛист?")
+    assert not any(e.employee_id == "e-belov" and "писал" in e.reason for e in experts)

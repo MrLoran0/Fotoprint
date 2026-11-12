@@ -431,3 +431,12 @@ dialog.drawer::backdrop { background: #050a11a0 }
 .voice-task-quote blockquote { margin: 4px 0 0; padding-left: 10px; border-left: 2px solid var(--accent); color: var(--muted); font-style: italic }
 .voice-task-action { display: flex; justify-content: flex-end; margin-top: 4px }
 .voice-unmatched { background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 8px 12px }
+
+/* обратная связь и правка протокола (AI-07) */
+.feedback { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px }
+.feedback .icon-button[aria-pressed="true"] { border-color: var(--accent) }
+.feedback-form { display: grid; gap: 8px; flex-basis: 100% }
+.segments li { position: relative }
+.seg-add { margin-left: auto; white-space: nowrap }
+.summary-edit { margin-bottom: 12px }
+.new-items .pitem { border-left: 3px solid var(--accent) }

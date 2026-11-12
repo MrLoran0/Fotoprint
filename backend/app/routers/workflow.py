@@ -24,16 +24,19 @@ from ..actions import (
 )
 from ..config import get_settings
 from ..db import get_db
-from ..evidence import sensitive_request
+from ..evidence import sensitive_request, suspicious
 from ..ingest import parse_transcript
 from ..llm import LLMError, get_gateway
 from ..models import (
     ROLE_DIRECTOR,
     ActionProposal,
+    AuditLog,
     CalendarEvent,
     Employee,
+    Feedback,
     Meeting,
     Protocol,
+    ProtocolItem,
     Task,
     Transcript,
     User,
@@ -48,6 +51,8 @@ from ..schemas import (
     CreateEventPayload,
     DraftPatchIn,
     EventOut,
+    FeedbackIn,
+    FeedbackOut,
     FreeSlotsIn,
     MeetingOut,
     ProtocolDraftOut,
@@ -196,10 +201,65 @@ def patch_draft(draft_id: str, body: DraftPatchIn, user: User = Depends(current_
                 item.needs_clarification.append("owner_employee_id")
             if item.due_at is None:
                 item.needs_clarification.append("due_at")
+    if body.new_items:
+        segments = {s["n"]: s["text"] for s in db.get(Transcript, protocol.transcript_id).segments}
+        position = max((i.position for i in protocol.items), default=0)
+        default_status = {"decision": "decided", "proposal": "proposed", "task": "decided", "question": "needs_clarification",
+                          "risk": "discussed", "discussion": "discussed"}
+        for new in body.new_items:
+            text = segments.get(new.segment_id)
+            if text is None:
+                raise HTTPException(422, "Выберите реплику расшифровки, на которую опирается пункт")
+            if suspicious(text):
+                raise HTTPException(422, "Реплика содержит подозрительную инструкцию — её нельзя взять основанием")
+            if not new.statement.strip():
+                raise HTTPException(422, "Формулировка должна содержать от 1 до 500 символов")
+            if new.owner_employee_id:
+                validate_owner(db, user, new.owner_employee_id)
+            if new.due_at:
+                validate_due(new.due_at)
+            position += 1
+            status = "proposed" if new.kind == "proposal" else (new.decision_status or default_status[new.kind])
+            needs = []
+            if new.kind == "task":
+                needs = [f for f, v in (("owner_employee_id", new.owner_employee_id), ("due_at", new.due_at)) if v is None]
+            protocol.items.append(ProtocolItem(
+                id=new_id("pi"), position=position, kind=new.kind, statement=new.statement.strip(), decision_status=status,
+                segment_id=new.segment_id, evidence_quote=text, quote_verified=True,
+                owner_employee_id=new.owner_employee_id, owner_origin="user_entered" if new.owner_employee_id else "unknown",
+                due_at=new.due_at, due_origin="user_entered" if new.due_at else "unknown", needs_clarification=needs))
+    if body.summary is not None:
+        protocol.summary = body.summary.strip()
     protocol.revision += 1
     audit.write(db, user, "protocol.edit", object_type="protocol", object_id=protocol.id,
-                details={"revision": protocol.revision})
+                details={"revision": protocol.revision, "edited": len(body.items), "added": len(body.new_items),
+                         "summary_edited": body.summary is not None})
+    db.refresh(protocol)
     return draft_out(db, protocol)
+
+
+@router.post("/feedback", response_model=FeedbackOut)
+def feedback(body: FeedbackIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Оценка ответа ассистента или протокола (AI-07). Оценить можно только то, что пользователь видел сам."""
+    if body.target_type == "answer":
+        entry = db.get(AuditLog, int(body.target_id)) if body.target_id.isdigit() else None
+        if entry is None or entry.user_id != user.id or entry.action != "assistant.ask":
+            raise HTTPException(404, "Ответ не найден")
+    elif body.target_type == "protocol":
+        get_protocol(db, user, body.target_id)
+    else:
+        item = db.get(ProtocolItem, body.target_id)
+        if item is None:
+            raise HTTPException(404, "Пункт не найден")
+        get_protocol(db, user, item.protocol_id)
+    row = Feedback(id=new_id("fb"), user_id=user.id, target_type=body.target_type, target_id=body.target_id,
+                   rating=body.rating, comment=body.comment.strip())
+    db.add(row)
+    audit.write(db, user, "feedback", object_type=body.target_type, object_id=body.target_id,
+                result="positive" if body.rating > 0 else "negative", details={"comment": bool(row.comment)}, commit=False)
+    db.commit()
+    db.refresh(row)
+    return FeedbackOut.model_validate(row)
 
 
 @router.post("/drafts/{draft_id}/proposals", response_model=list[ActionOut])

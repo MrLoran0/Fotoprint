@@ -3,7 +3,7 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy.orm import Session
 
-from ..evidence import quote_matches, suspicious
+from ..evidence import claim_supported, quote_matches, suspicious
 from ..llm import LLMError, LLMGateway
 from ..models import Document, DocumentChunk, User
 from ..schemas import AskOut, Claim, SourceRef
@@ -40,6 +40,8 @@ SYSTEM = """Ответь на русском только по доступны�
 («нет данных о …»). Лучше честно сказать, чего нет, чем угадать.
 Нет основания для ответа совсем: status=not_found, claims=[]. Иначе status=answered.
 Не используй внешние знания. Не выдумывай документы, версии, даты, авторов и цитаты.
+Сохраняй модальность источника: обещание («направим до 13.11», «пришлю до пятницы») — это обещание, а не факт
+поступления; план — не выполнение; предложение — не решение. Пиши «обещал(а) направить до 13.11», а не «поступил».
 """
 
 NOT_FOUND = "Недостаточно данных в доступных вам источниках."
@@ -78,7 +80,7 @@ async def answer(db: Session, user: User, gateway: LLMGateway, question: str,
     except (ValidationError, ValueError) as exc:
         raise LLMError("Модель вернула некорректный ответ. Повторите запрос.") from exc
     db.refresh(user)
-    claims, dropped = [], 0
+    claims, dropped, meaning_gaps = [], 0, []
     for claim in parsed.claims if parsed.status == "answered" else []:
         sources = []
         for citation in claim.citations:
@@ -96,11 +98,18 @@ async def answer(db: Session, user: User, gateway: LLMGateway, question: str,
                                      author=chunk.author_raw, sent_at=chunk.sent_at, channel_id=doc.channel_id))
         else:
             if sources:
-                claims.append(Claim(text=claim.text, sources=sources))
+                ok, why = claim_supported(claim.text, [s.quote for s in sources])
+                if ok:
+                    claims.append(Claim(text=claim.text, sources=sources))
+                else:
+                    # цитата настоящая, но вывод из неё не следует — не показываем вывод, честно говорим почему
+                    meaning_gaps.append(f"«{claim.text.strip()}» — {why}: «{sources[0].quote.strip()}»")
             continue
         dropped += 1
         warnings.append("Утверждение без доступной подтверждённой цитаты исключено")
-    gaps = [g.strip() for g in parsed.unanswered if g.strip()]
+    gaps = [g.strip() for g in parsed.unanswered if g.strip()] + meaning_gaps
+    if meaning_gaps:
+        warnings.append("Часть выводов модели не следует из цитат и исключена")
     if dropped:
         gaps.append("Часть ответа модели не подтвердилась цитатой из источника и исключена")
     if not claims:

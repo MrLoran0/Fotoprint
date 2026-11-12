@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { api, demoPassword, hasSession, login, logout, type S } from './api/client'
+import { api, clearDrafts, demoPassword, hasSession, login, logout, type S } from './api/client'
 import { ActionDialog } from './components/ActionDialog'
 import { VoiceModal } from './components/VoiceModal'
 import { Badge, Button } from './components/ui'
@@ -71,7 +71,7 @@ export default function App() {
   }, [])
   useEffect(() => { const fn = () => setRoute(parseHash()); window.addEventListener('hashchange', fn); return () => window.removeEventListener('hashchange', fn) }, [])
   const resetWorkspace = useCallback(() => {
-    setEmployees([]); setPending([]); setAction(undefined); setTrayOpen(false); setMenuOpen(false); setToastText('')
+    setEmployees([]); setPending([]); setAction(undefined); setVoiceOpen(false); setTrayOpen(false); setMenuOpen(false); setToastText('')
   }, [])
   const signOut = useCallback(() => {
     logout(); resetWorkspace(); setUser(undefined)
@@ -127,7 +127,7 @@ export default function App() {
   async function switchRole(loginName: string) {
     if (!demoPassword || switching || loginName === user?.login) return
     setSwitching(true)
-    try { const next = await login(loginName, demoPassword); resetWorkspace(); setUser(next); setTick(t => t + 1) }
+    try { const next = await login(loginName, demoPassword); clearDrafts(); resetWorkspace(); setUser(next); setTick(t => t + 1) }
     catch (e) { setToastText((e as Error).message) }
     finally { setSwitching(false) }
   }

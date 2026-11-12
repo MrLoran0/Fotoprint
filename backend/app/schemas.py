@@ -229,9 +229,24 @@ class TranscriptIn(BaseModel):
     text: str = Field(min_length=1, max_length=60000)
 
 
+class ProtocolItemNew(BaseModel):
+    """Пропущенный моделью пункт, который добавляет человек. Основание — реплика расшифровки (segment_id):
+    сервер сам берёт её текст как цитату, поэтому правило «каждый пункт опирается на цитату» сохраняется."""
+
+    model_config = ConfigDict(extra="forbid")
+    kind: ItemKind
+    statement: str = Field(min_length=1, max_length=500)
+    segment_id: int
+    decision_status: DecisionStatus | None = None
+    owner_employee_id: str | None = None
+    due_at: datetime | None = None
+
+
 class DraftPatchIn(BaseModel):
     revision: int  # текущая ревизия у клиента — защита от потери чужих правок
-    items: list[ProtocolItemPatch]
+    items: list[ProtocolItemPatch] = Field(default_factory=list)
+    new_items: list[ProtocolItemNew] = Field(default_factory=list, max_length=20)
+    summary: str | None = Field(default=None, max_length=2000)
 
 
 # ---------------------------------------------------------------- действия
@@ -463,10 +478,20 @@ class AuditOut(Out):
 
 
 class FeedbackIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     target_type: Literal["answer", "protocol", "protocol_item"]
-    target_id: str
+    target_id: str = Field(min_length=1, max_length=100)  # answer → audit_id ответа; protocol/protocol_item → их id
     rating: Literal[1, -1]
+    comment: str = Field(default="", max_length=1000)
+
+
+class FeedbackOut(Out):
+    id: str
+    target_type: str
+    target_id: str
+    rating: int
     comment: str = ""
+    created_at: datetime
 
 
 class ReminderLetter(BaseModel):

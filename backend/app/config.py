@@ -24,8 +24,9 @@ class Settings(BaseSettings):
 
     # gemini — внешний API (демо по умолчанию: на наших ноутбуках умная локальная модель не помещается);
     # local — любой OpenAI-совместимый сервер в контуре заказчика (vLLM, LM Studio, TGI…) — путь для пилота;
-    # ollama — локальная модель через Ollama; fake — детерминированная dev-заглушка без ИИ (на стенде запрещена)
-    llm_provider: Literal["gemini", "local", "ollama", "fake"] = "gemini"
+    # ollama — локальная модель через Ollama; openai / anthropic — внешние API (GPT, Claude);
+    # fake — детерминированная dev-заглушка без ИИ (на стенде запрещена)
+    llm_provider: Literal["gemini", "openai", "anthropic", "local", "ollama", "fake"] = "gemini"
     llm_model: str = "qwen3:8b"
     embed_model: str = "bge-m3"
     ollama_base_url: str = "http://ollama:11434"
@@ -33,6 +34,14 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    # OpenAI (GPT) — внешний API; base_url можно заменить на корпоративный прокси / совместимый адрес
+    openai_api_key: str = ""
+    openai_model: str = "gpt-5-mini"
+    openai_base_url: str = "https://api.openai.com/v1"
+    # Anthropic (Claude) — внешний API, нативный Messages API
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-sonnet-5-5"
+    anthropic_base_url: str = "https://api.anthropic.com"
     # OpenAI-совместимый сервер внутри контура (например vLLM на GPU-сервере заказчика)
     local_base_url: str = "http://localhost:8001/v1"
     local_api_key: str = ""

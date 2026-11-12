@@ -284,6 +284,26 @@ export interface paths {
         patch: operations["patch_draft_drafts__draft_id__patch"];
         trace?: never;
     };
+    "/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Feedback
+         * @description Оценка ответа ассистента или протокола (AI-07). Оценить можно только то, что пользователь видел сам.
+         */
+        post: operations["feedback_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/drafts/{draft_id}/proposals": {
         parameters: {
             query?: never;
@@ -1301,7 +1321,11 @@ export interface components {
             /** Revision */
             revision: number;
             /** Items */
-            items: components["schemas"]["ProtocolItemPatch"][];
+            items?: components["schemas"]["ProtocolItemPatch"][];
+            /** New Items */
+            new_items?: components["schemas"]["ProtocolItemNew"][];
+            /** Summary */
+            summary?: string | null;
         };
         /** EmployeeOut */
         EmployeeOut: {
@@ -1385,6 +1409,27 @@ export interface components {
              * @default
              */
             comment: string;
+        };
+        /** FeedbackOut */
+        FeedbackOut: {
+            /** Id */
+            id: string;
+            /** Target Type */
+            target_type: string;
+            /** Target Id */
+            target_id: string;
+            /** Rating */
+            rating: number;
+            /**
+             * Comment
+             * @default
+             */
+            comment: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** FreeSlotsIn */
         FreeSlotsIn: {
@@ -1693,6 +1738,28 @@ export interface components {
              * @default []
              */
             segments: components["schemas"]["TranscriptSegment"][];
+        };
+        /**
+         * ProtocolItemNew
+         * @description Пропущенный моделью пункт, который добавляет человек. Основание — реплика расшифровки (segment_id):
+         *     сервер сам берёт её текст как цитату, поэтому правило «каждый пункт опирается на цитату» сохраняется.
+         */
+        ProtocolItemNew: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "decision" | "proposal" | "discussion" | "question" | "risk" | "task";
+            /** Statement */
+            statement: string;
+            /** Segment Id */
+            segment_id: number;
+            /** Decision Status */
+            decision_status?: ("decided" | "proposed" | "discussed" | "needs_clarification") | null;
+            /** Owner Employee Id */
+            owner_employee_id?: string | null;
+            /** Due At */
+            due_at?: string | null;
         };
         /** ProtocolItemOut */
         ProtocolItemOut: {
@@ -2579,6 +2646,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProtocolDraftOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    feedback_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackOut"];
                 };
             };
             /** @description Validation Error */

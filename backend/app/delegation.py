@@ -13,7 +13,7 @@
 
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
@@ -216,6 +216,19 @@ def suggest(db: Session, user: User, task: Task) -> Suggestion | None:
     return None
 
 
+DEFAULT_DUE_WORKDAYS = 3
+
+
+def default_due(now: datetime, workdays: int = DEFAULT_DUE_WORKDAYS) -> datetime:
+    """Стандартный срок, когда его нет ни в поручении, ни в источниках: N рабочих дней, 18:00 (выходные пропускаем)."""
+    day = now.date()
+    while workdays:
+        day += timedelta(days=1)
+        if day.weekday() < 5:
+            workdays -= 1
+    return datetime.combine(day, time(18, 0), tzinfo=now.tzinfo)
+
+
 def propose(db: Session, user: User, task: Task) -> ActionProposal | None:
     """Карточка delegate_task (origin=ai) — идемпотентна для одного и того же состояния задачи."""
     if task.owner_employee_id or task.status in {"done", "cancelled"}:
@@ -224,14 +237,21 @@ def propose(db: Session, user: User, task: Task) -> ActionProposal | None:
     if s is None:
         return None
     snapshot = payload_hash(task_snapshot(task))
-    due_val = task.due_at or s.due_at
+    due_val, reason = task.due_at or s.due_at, s.reason
+    if due_val is None:
+        # §7.2.4: срок не сказан и не найден в переписке — предлагаем стандартный по правилу (считает код, не модель);
+        # человек видит это в основании и может изменить срок в карточке до подтверждения
+        now = get_settings().now()
+        due_val = default_due(now)
+        reason += (f". Срок в поручении и источниках не найден — предложен стандартный: {DEFAULT_DUE_WORKDAYS} рабочих дня, "
+                   f"до {due_val.astimezone(now.tzinfo):%d.%m %H:%M}; измените при необходимости")
     payload = {
         "task_id": task.id,
         "expected_hash": snapshot,
         "owner_employee_id": s.employee.id,
-        "due_at": due_val.isoformat() if due_val else None,
+        "due_at": due_val.isoformat(),
         "expected_result": task.expected_result or "",
-        "reason": s.reason,
+        "reason": reason,
     }
     key = payload_hash({"user": user.id, "delegate": task.id, "snapshot": snapshot})
     action = create_action(db, user, "delegate_task", payload, key=key, origin="ai")

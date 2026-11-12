@@ -41,11 +41,16 @@ def history(limit: int = Query(default=100, ge=1, le=500), user: User = Depends(
     if user.role != ROLE_DIRECTOR:
         query = query.where(AuditLog.user_id == user.id)
     rows = db.scalars(query.limit(limit)).all()
+    # Чужой вопрос ассистенту и ссылки на найденную переписку — личные данные автора: директор видит факт, маршрут
+    # и результат, но не текст вопроса и не ID чужих фрагментов (иначе журнал раскрыл бы закрытые чаты).
+    private = {"question", "candidate_chunks", "cited_chunks"}
     names = {u.id: u.full_name for u in db.scalars(select(User)).all()}
     out = []
     for row in rows:
         if visible(db, user, row):
             item = AuditOut.model_validate(row)
+            if row.user_id != user.id and private & set(item.details or {}):
+                item.details = {k: v for k, v in item.details.items() if k not in private} | {"скрыто": "текст запроса и источники видны только автору"}
             item.user_name = names.get(row.user_id)
             out.append(item)
     return out

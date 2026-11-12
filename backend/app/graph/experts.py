@@ -38,12 +38,13 @@ def suggest_experts(db: Session, user: User, question: str, limit: int = 3) -> l
             add(i, 3, "упомянут(а) в вопросе")
     entity_ids = [i for t, i, _ in targets if t == "entity"]
     if entity_ids:
-        # авторы сообщений и писем об этих сущностях — только из того, что пользователь и так может открыть
+        # авторы сообщений и писем об этих сущностях — только из того, что разрешено ИИ (ai_allowed) и доступно пользователю:
+        # подсказка «кто может знать» — тоже вывод ИИ, закрытые для ИИ документы (оклады, ПДн) в неё не попадают
         rows = db.execute(
             select(DocumentChunk.author_employee_id, func.count())
             .join(Mention, Mention.chunk_id == DocumentChunk.id).join(Document, Document.id == DocumentChunk.document_id)
             .where(Mention.target_id.in_(entity_ids), DocumentChunk.author_employee_id.is_not(None),
-                   readable_document_filter(user, for_ai=False))
+                   readable_document_filter(user, for_ai=True))
             .group_by(DocumentChunk.author_employee_id)
         ).all()
         for emp_id, n in rows:

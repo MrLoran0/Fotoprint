@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import { Feedback } from '../components/Feedback'
 import { api, ApiError, id, type S } from '../api/client'
 import { PeoplePicker, PersonSelect } from '../components/PeoplePicker'
 import { ProtocolPrintButton } from '../components/ProtocolPrintButton'
@@ -158,13 +159,19 @@ const itemStatuses: NonNullable<Item['decision_status']>[] = ['decided', 'propos
 function Protocol() {
   const meetings = useLoad(() => api.get<S['MeetingOut'][]>('/meetings'), [])
   const [meetingId, setMeetingId] = useDraft('selected-meeting')
+  const dirtyRef = useRef(false)
   const meeting = meetings.data?.find(m => m.id === meetingId)
-  const picker = <label>Встреча<select value={meeting?.id ?? ''} onChange={e => setMeetingId(e.target.value)}>
+  const choose = (next: string) => {
+    if (dirtyRef.current && !window.confirm('В протоколе есть несохранённые правки. Перейти к другой встрече и потерять их?')) return
+    dirtyRef.current = false
+    setMeetingId(next)
+  }
+  const picker = <label>Встреча<select value={meeting?.id ?? ''} onChange={e => choose(e.target.value)}>
     <option value="">{meetings.loading ? 'Загружаем встречи…' : 'Выберите встречу'}</option>
     {meetings.data?.map(m => <option key={m.id} value={m.id}>{dateOnly(m.starts_at)} · {m.title}</option>)}
   </select></label>
   const meetingError = <ErrorNote error={meetings.error} onRetry={meetings.reload} />
-  if (meeting) return <ProtocolEditor key={meeting.id} meeting={meeting} picker={picker} />
+  if (meeting) return <ProtocolEditor key={meeting.id} meeting={meeting} picker={picker} onDirty={d => { dirtyRef.current = d }} />
   return <div className="protocol-layout">
     <Card title="Расшифровка" icon="✎">
       <div className="form-grid">{picker}{meetingError}{meetings.data?.length === 0 && <Empty>Нет доступных встреч.</Empty>}</div>
@@ -173,7 +180,9 @@ function Protocol() {
   </div>
 }
 
-function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker: React.ReactNode }) {
+type NewItem = { key: number; segment_id: number; kind: Item['kind']; statement: string }
+
+function ProtocolEditor({ meeting, picker, onDirty }: { meeting: S['MeetingOut']; picker: React.ReactNode; onDirty: (dirty: boolean) => void }) {
   const ws = useWorkspace()
   const meetingId = meeting.id
   const [text, setText] = useDraft(`transcript-${meetingId}`, '')
@@ -184,6 +193,8 @@ function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker:
   const [error, setError] = useState('')
   const [conflict, setConflict] = useState(false)
   const [focusSeg, setFocusSeg] = useState<number>()
+  const [newItems, setNewItems] = useState<NewItem[]>([])
+  const [summary, setSummary] = useState('')
   const locked = busy !== ''
   const alive = useRef(false)
   useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
@@ -197,7 +208,7 @@ function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker:
     } finally { setBusy('') }
   }
   function loadDraft(d: S['ProtocolDraftOut']) {
-    setDraft(d); setItems(d.items); setConflict(false)
+    setDraft(d); setItems(d.items); setConflict(false); setNewItems([]); setSummary(d.summary)
   }
   const loadSample = () => run('sample', async () => {
     const rows = await api.get<{ text: string }[]>(`/meetings/${id(meetingId)}/transcripts`)
@@ -220,14 +231,28 @@ function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker:
     if (item.removed !== before.removed) patch.removed = item.removed
     return Object.keys(patch).length > 1 ? [patch] : []
   })
-  const dirty = changed.length > 0
+  const summaryChanged = draft != null && summary.trim() !== draft.summary.trim()
+  const editCount = changed.length + newItems.length + (summaryChanged ? 1 : 0)
+  const dirty = editCount > 0
+  useEffect(() => { onDirty(dirty) }, [dirty, onDirty])
+  useEffect(() => {
+    if (!dirty) return
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [dirty])
   const save = () => run('save', async () => {
     if (!draft) return
     const d = await api.patch<S['ProtocolDraftOut']>(`/drafts/${id(draft.id)}`, {
       revision: draft.revision, items: changed,
+      new_items: newItems.map(n => ({ kind: n.kind, statement: n.statement.trim(), segment_id: n.segment_id })),
+      ...(summaryChanged ? { summary: summary.trim() } : {}),
     })
     loadDraft(d)
   })
+  const addFromSegment = (segment: S['TranscriptSegment']) =>
+    setNewItems(list => [...list, { key: Date.now() + segment.n, segment_id: segment.n, kind: 'task', statement: segment.text.slice(0, 500) }])
+  const updateNew = (key: number, patch: Partial<NewItem>) => setNewItems(list => list.map(n => n.key === key ? { ...n, ...patch } : n))
   const reloadDraft = () => run('reload', async () => {
     loadDraft(await api.get<S['ProtocolDraftOut']>(`/drafts/${id(savedDraftId)}`))
   })
@@ -271,7 +296,9 @@ function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker:
       </Card>
       {draft && <Card title="Исходные реплики" icon="◷" subtitle="Каждый пункт протокола опирается на цитату">
         <ol className="segments">{draft.segments.map(s => <li key={s.n} className={focusSeg === s.n ? 'focus' : ''} id={`seg-${s.n}`} tabIndex={-1}>
-          <span className="seg-n">{s.n}</span><span>{s.ts && <small className="muted">[{s.ts}] </small>}<strong>{s.speaker}:</strong> {s.text}</span></li>)}</ol>
+          <span className="seg-n">{s.n}</span><span>{s.ts && <small className="muted">[{s.ts}] </small>}<strong>{s.speaker}:</strong> {s.text}</span>
+          {draft.status !== 'published' && <button type="button" className="text-button seg-add" disabled={locked} title="Модель пропустила пункт — добавить его к этой реплике"
+            onClick={() => addFromSegment(s)}>+ пункт</button>}</li>)}</ol>
       </Card>}
     </div>
     <div>
@@ -284,6 +311,18 @@ function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker:
               <Button kind="ghost" onClick={() => ws.go('tasks')}>Поручения</Button>
               <Button kind="primary" disabled={locked} busy={busy === 'publish'} onClick={() => void publish()}>Разослать итоги →</Button></span>
           </div>}
+          {!published && <label className="summary-edit">Краткое содержание
+            <textarea rows={2} maxLength={2000} value={summary} disabled={locked} onChange={e => setSummary(e.target.value)} /></label>}
+          {newItems.length > 0 && <section className="item-group new-items"><h3>Добавлено вами <small className="muted">{newItems.length} · сохраните правки</small></h3>
+            {newItems.map(n => <article key={n.key} className="pitem">
+              <div className="pitem-top"><Badge tone="info">новый пункт</Badge><Badge tone="success" title="Основание — реплика расшифровки">✓ цитата</Badge>
+                <button className="text-button push" onClick={() => setNewItems(list => list.filter(x => x.key !== n.key))}>Убрать</button></div>
+              <input className="pitem-text" maxLength={500} value={n.statement} onChange={e => updateNew(n.key, { statement: e.target.value })} aria-label="Формулировка нового пункта" />
+              <label>Вид пункта<select value={n.kind} onChange={e => updateNew(n.key, { kind: e.target.value as Item['kind'] })}>
+                {itemKinds.map(value => <option key={value} value={value}>{KIND_LABEL[value]}</option>)}</select></label>
+              <small className="muted">↳ реплика {n.segment_id}. Владельца и срок задачи можно указать после сохранения.</small>
+            </article>)}
+          </section>}
           <fieldset className="protocol-items" disabled={locked}>{itemKinds.map(kind => {
             const list = items.filter(i => i.kind === kind && (!published || !i.removed))
             if (!list.length) return null
@@ -331,10 +370,11 @@ function ProtocolEditor({ meeting, picker }: { meeting: S['MeetingOut']; picker:
             <Button disabled={locked} busy={busy === 'reload'} onClick={() => void reloadDraft()}>Загрузить актуальную версию</Button>
           </div>}
           {!published && <div className="sticky-actions">
-            <span className="muted small">{changed.length ? `Несохранённых правок: ${changed.length}` : `Ревизия ${draft.revision}`}</span>
-            <Button disabled={locked || !dirty || conflict || items.some(i => !i.removed && !i.statement.trim())} busy={busy === 'save'} onClick={() => void save()}>Сохранить правки</Button>
+            <span className="muted small">{dirty ? `Несохранённых правок: ${editCount}` : `Ревизия ${draft.revision}`}</span>
+            <Button disabled={locked || !dirty || conflict || items.some(i => !i.removed && !i.statement.trim()) || newItems.some(n => !n.statement.trim())} busy={busy === 'save'} onClick={() => void save()}>Сохранить правки</Button>
             <Button kind="primary" disabled={locked || dirty || conflict} busy={busy === 'publish'} onClick={() => void publish()}>Опубликовать и создать поручения →</Button>
           </div>}
+          <Feedback targetType="protocol" targetId={draft.id} label="Протокол составлен верно?" />
         </Card>}
     </div>
   </div>

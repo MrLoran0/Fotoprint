@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Feedback } from '../components/Feedback'
 import { api, type S } from '../api/client'
 import { SourceList } from '../components/Sources'
 import { Badge, Button } from '../components/ui'
@@ -80,6 +81,7 @@ function Answer({ a, onAsk, busy }: { a: S['AskOut']; onAsk: (q: string) => void
         <div><strong>{e.full_name}</strong> <small className="muted">{e.position}</small><small className="block">{e.reason}</small></div></div>)}</div>}
     {a.warnings.map((w, i) => <div key={i} className="notice warning small">{w}</div>)}
     {a.status === 'refused' && <p className="muted small">Оклады и персональные данные не обрабатываются AI ни для одной роли — это зафиксировано в аудите.</p>}
+    {a.audit_id != null && a.status !== 'refused' && <Feedback targetType="answer" targetId={String(a.audit_id)} label="Ответ верный?" />}
     {a.status === 'not_found' && a.experts.length === 0 && <button className="text-button" disabled={busy} onClick={() => onAsk('Кто отвечает за эту тему?')}>Спросить, кто отвечает за тему →</button>}
   </div>
 }
