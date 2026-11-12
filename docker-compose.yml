@@ -19,6 +19,14 @@ x-api-env: &api-env
   GEMINI_API_KEY: ${GEMINI_API_KEY:-}
   GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
   GEMINI_BASE_URL: ${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai}
+  STT_PROVIDER: ${STT_PROVIDER:-off}
+  STT_MAX_MB: ${STT_MAX_MB:-200}
+  STT_TIMEOUT_S: ${STT_TIMEOUT_S:-240}
+  STT_WHISPER_MODEL_DIR: ${STT_WHISPER_MODEL_DIR:-/models/whisper}
+  STT_WHISPER_DEVICE: ${STT_WHISPER_DEVICE:-cpu}
+  STT_WHISPER_COMPUTE_TYPE: ${STT_WHISPER_COMPUTE_TYPE:-int8}
+  STT_OPENAI_MODEL: ${STT_OPENAI_MODEL:-gpt-transcribe}
+  STT_GEMINI_MODEL: ${STT_GEMINI_MODEL:-gemini-2.5-flash}
   OPENAI_API_KEY: ${OPENAI_API_KEY:-}
   OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
   OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
@@ -51,7 +59,10 @@ services:
       retries: 30
 
   api:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        INSTALL_WHISPER: ${INSTALL_WHISPER:-false}
     environment: *api-env
     ports:
       - "${API_PORT:-8000}:8000"

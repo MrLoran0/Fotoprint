@@ -7,8 +7,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+ARG INSTALL_WHISPER=false
+COPY requirements.txt requirements-whisper.txt ./
+RUN pip install -r requirements.txt && \
+    if [ "$INSTALL_WHISPER" = "true" ]; then pip install -r requirements-whisper.txt; fi
 
 COPY pyproject.toml .
 COPY app ./app

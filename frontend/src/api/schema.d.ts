@@ -476,6 +476,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stt/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_stt_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meetings/{meeting_id}/audio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Meeting Audio */
+        post: operations["meeting_audio_meetings__meeting_id__audio_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/voice/audio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Voice Audio */
+        post: operations["voice_audio_voice_audio_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/assistant/ask": {
         parameters: {
             query?: never;
@@ -796,6 +847,8 @@ export interface components {
             type: "publish_protocol" | "create_tasks" | "create_event" | "send_summary" | "delegate_task" | "update_task" | "send_reminders" | "send_brief" | "create_decision";
             /** Payload */
             payload: Record<string, never>;
+        } & {
+            [key: string]: unknown;
         };
         /** ActionEditIn */
         ActionEditIn: {
@@ -803,6 +856,8 @@ export interface components {
             revision: number;
             /** Payload */
             payload: Record<string, never>;
+        } & {
+            [key: string]: unknown;
         };
         /** ActionOut */
         ActionOut: {
@@ -843,6 +898,8 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        } & {
+            [key: string]: unknown;
         };
         /** AgendaPoint */
         AgendaPoint: {
@@ -857,11 +914,15 @@ export interface components {
             sources: components["schemas"]["SourceRef"][];
             /** Returned Task Id */
             returned_task_id?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** AskIn */
         AskIn: {
             /** Question */
             question: string;
+        } & {
+            [key: string]: unknown;
         };
         /** AskOut */
         AskOut: {
@@ -901,6 +962,41 @@ export interface components {
             warnings: string[];
             /** Audit Id */
             audit_id?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AudioSegment */
+        AudioSegment: {
+            /** Start */
+            start: number;
+            /** End */
+            end: number;
+            /** Speaker */
+            speaker: string;
+            /** Text */
+            text: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** AudioTranscriptOut */
+        AudioTranscriptOut: {
+            /** Text */
+            text: string;
+            /** Segments */
+            segments: components["schemas"]["AudioSegment"][];
+            /**
+             * Route
+             * @enum {string}
+             */
+            route: "local" | "external";
+            /** Model */
+            model: string;
+            /** Duration S */
+            duration_s: number;
+            /** Warnings */
+            warnings: string[];
+        } & {
+            [key: string]: unknown;
         };
         /** AuditOut */
         AuditOut: {
@@ -927,6 +1023,8 @@ export interface components {
             result: string;
             /** Details */
             details: Record<string, never>;
+        } & {
+            [key: string]: unknown;
         };
         /** Breakdown */
         Breakdown: {
@@ -938,6 +1036,8 @@ export interface components {
             period: string;
             /** Rows */
             rows: components["schemas"]["BreakdownRow"][];
+        } & {
+            [key: string]: unknown;
         };
         /** BreakdownRow */
         BreakdownRow: {
@@ -951,6 +1051,8 @@ export interface components {
             denominator: number;
             /** Share */
             share: number;
+        } & {
+            [key: string]: unknown;
         };
         /** Claim */
         Claim: {
@@ -967,6 +1069,8 @@ export interface components {
              * @default []
              */
             sources: components["schemas"]["SourceRef"][];
+        } & {
+            [key: string]: unknown;
         };
         /** ConfirmIn */
         ConfirmIn: {
@@ -974,6 +1078,8 @@ export interface components {
             revision: number;
             /** Payload Hash */
             payload_hash: string;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * ContractBundle
@@ -1009,6 +1115,8 @@ export interface components {
             voice_task_in?: components["schemas"]["VoiceTaskIn"] | null;
             structured_voice_task?: components["schemas"]["StructuredVoiceTask"] | null;
             voice_structure_out?: components["schemas"]["VoiceStructureOut"] | null;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * CreateDecisionPayload
@@ -1054,6 +1162,8 @@ export interface components {
              * @default true
              */
             create_task: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * CreateEventPayload
@@ -1096,6 +1206,8 @@ export interface components {
              * @default
              */
             message: string;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * CreateEventPayload
@@ -1138,6 +1250,8 @@ export interface components {
              * @default
              */
             message: string;
+        } & {
+            [key: string]: unknown;
         };
         /** DecisionNeeded */
         DecisionNeeded: {
@@ -1166,6 +1280,8 @@ export interface components {
              * @enum {string}
              */
             severity: "info" | "warning" | "critical";
+        } & {
+            [key: string]: unknown;
         };
         /** DecisionOut */
         DecisionOut: {
@@ -1232,11 +1348,15 @@ export interface components {
              * @default false
              */
             check_due: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** DelegateIn */
         DelegateIn: {
             /** Task Id */
             task_id: string;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * DelegateTaskPayload
@@ -1258,6 +1378,8 @@ export interface components {
             expected_result: string;
             /** Reason */
             reason: string;
+        } & {
+            [key: string]: unknown;
         };
         /** DemoAccountOut */
         DemoAccountOut: {
@@ -1269,6 +1391,8 @@ export interface components {
             role: string;
             /** Role Label */
             role_label: string;
+        } & {
+            [key: string]: unknown;
         };
         /** DocumentFull */
         DocumentFull: {
@@ -1293,6 +1417,8 @@ export interface components {
             ai_allowed: boolean;
             /** Content */
             content: string;
+        } & {
+            [key: string]: unknown;
         };
         /** DocumentListItem */
         DocumentListItem: {
@@ -1315,6 +1441,8 @@ export interface components {
             department_id: string | null;
             /** Ai Allowed */
             ai_allowed: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** DraftPatchIn */
         DraftPatchIn: {
@@ -1326,6 +1454,8 @@ export interface components {
             new_items?: components["schemas"]["ProtocolItemNew"][];
             /** Summary */
             summary?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** EmployeeOut */
         EmployeeOut: {
@@ -1344,6 +1474,8 @@ export interface components {
              * @default []
              */
             responsibilities: string[];
+        } & {
+            [key: string]: unknown;
         };
         /** EventOut */
         EventOut: {
@@ -1375,6 +1507,8 @@ export interface components {
              * @enum {string}
              */
             source: "seed" | "fokus";
+        } & {
+            [key: string]: unknown;
         };
         /**
          * ExpertHint
@@ -1389,6 +1523,8 @@ export interface components {
             position: string;
             /** Reason */
             reason: string;
+        } & {
+            [key: string]: unknown;
         };
         /** FeedbackIn */
         FeedbackIn: {
@@ -1409,6 +1545,8 @@ export interface components {
              * @default
              */
             comment: string;
+        } & {
+            [key: string]: unknown;
         };
         /** FeedbackOut */
         FeedbackOut: {
@@ -1430,6 +1568,8 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        } & {
+            [key: string]: unknown;
         };
         /** FreeSlotsIn */
         FreeSlotsIn: {
@@ -1445,6 +1585,8 @@ export interface components {
              * @default 5
              */
             days_ahead: number;
+        } & {
+            [key: string]: unknown;
         };
         /** GraphEdge */
         GraphEdge: {
@@ -1460,6 +1602,8 @@ export interface components {
             /** Label */
             label: string;
             evidence?: components["schemas"]["SourceRef"] | null;
+        } & {
+            [key: string]: unknown;
         };
         /** GraphNode */
         GraphNode: {
@@ -1479,6 +1623,8 @@ export interface components {
              * @default {}
              */
             meta: Record<string, never>;
+        } & {
+            [key: string]: unknown;
         };
         /** GraphOut */
         GraphOut: {
@@ -1488,11 +1634,15 @@ export interface components {
             nodes: components["schemas"]["GraphNode"][];
             /** Edges */
             edges: components["schemas"]["GraphEdge"][];
+        } & {
+            [key: string]: unknown;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        } & {
+            [key: string]: unknown;
         };
         /** HealthOut */
         HealthOut: {
@@ -1516,6 +1666,8 @@ export interface components {
              * @default false
              */
             smtp: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** LLMStatus */
         LLMStatus: {
@@ -1535,6 +1687,8 @@ export interface components {
              * @default
              */
             detail: string;
+        } & {
+            [key: string]: unknown;
         };
         /** LoginIn */
         LoginIn: {
@@ -1542,6 +1696,8 @@ export interface components {
             login: string;
             /** Password */
             password: string;
+        } & {
+            [key: string]: unknown;
         };
         /** MeetingBrief */
         MeetingBrief: {
@@ -1561,6 +1717,8 @@ export interface components {
              * @default []
              */
             returned_task_ids: string[];
+        } & {
+            [key: string]: unknown;
         };
         /** MeetingOut */
         MeetingOut: {
@@ -1593,6 +1751,8 @@ export interface components {
              * @enum {string}
              */
             status: "planned" | "held" | "cancelled";
+        } & {
+            [key: string]: unknown;
         };
         /** MeetingPrepOut */
         MeetingPrepOut: {
@@ -1611,6 +1771,8 @@ export interface components {
             route: "local" | "external";
             /** Model */
             model: string;
+        } & {
+            [key: string]: unknown;
         };
         /** MetricAnalysisOut */
         MetricAnalysisOut: {
@@ -1641,6 +1803,8 @@ export interface components {
             route: "local" | "external";
             /** Model */
             model: string;
+        } & {
+            [key: string]: unknown;
         };
         /** MetricOut */
         MetricOut: {
@@ -1674,6 +1838,8 @@ export interface components {
              * @enum {string}
              */
             status: "ok" | "warning" | "critical" | "no_data";
+        } & {
+            [key: string]: unknown;
         };
         /** MyDayOut */
         MyDayOut: {
@@ -1694,6 +1860,8 @@ export interface components {
             metrics: components["schemas"]["MetricOut"][];
             /** Overdue */
             overdue: components["schemas"]["TaskOut"][];
+        } & {
+            [key: string]: unknown;
         };
         /** PrepareIn */
         PrepareIn: {
@@ -1703,6 +1871,8 @@ export interface components {
             participant_ids: string[];
             /** Previous Meeting Id */
             previous_meeting_id?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** ProtocolDraftOut */
         ProtocolDraftOut: {
@@ -1738,6 +1908,8 @@ export interface components {
              * @default []
              */
             segments: components["schemas"]["TranscriptSegment"][];
+        } & {
+            [key: string]: unknown;
         };
         /**
          * ProtocolItemNew
@@ -1760,6 +1932,8 @@ export interface components {
             owner_employee_id?: string | null;
             /** Due At */
             due_at?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** ProtocolItemOut */
         ProtocolItemOut: {
@@ -1818,6 +1992,8 @@ export interface components {
              * @default false
              */
             removed: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * ProtocolItemPatch
@@ -1838,6 +2014,8 @@ export interface components {
             due_at?: string | null;
             /** Removed */
             removed?: boolean | null;
+        } & {
+            [key: string]: unknown;
         };
         /** ReminderLetter */
         ReminderLetter: {
@@ -1849,6 +2027,23 @@ export interface components {
             body: string;
             /** Task Ids */
             task_ids: string[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** STTStatusOut */
+        STTStatusOut: {
+            /** Configured */
+            configured: boolean;
+            /** Available */
+            available: boolean;
+            /** Route */
+            route: ("local" | "external") | null;
+            /** Max Mb */
+            max_mb: number;
+            /** Message */
+            message: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * SendBriefPayload
@@ -1861,6 +2056,8 @@ export interface components {
             subject: string;
             /** Body */
             body: string;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * SendRemindersPayload
@@ -1869,6 +2066,8 @@ export interface components {
         SendRemindersPayload: {
             /** Letters */
             letters: components["schemas"]["ReminderLetter"][];
+        } & {
+            [key: string]: unknown;
         };
         /**
          * SendSummaryPayload
@@ -1879,6 +2078,8 @@ export interface components {
             protocol_id: string;
             /** Letters */
             letters: components["schemas"]["SummaryLetter"][];
+        } & {
+            [key: string]: unknown;
         };
         /** SlotOut */
         SlotOut: {
@@ -1892,6 +2093,8 @@ export interface components {
              * Format: date-time
              */
             ends_at: string;
+        } & {
+            [key: string]: unknown;
         };
         /** SourceOut */
         SourceOut: {
@@ -1927,6 +2130,8 @@ export interface components {
             member_count: number;
             /** Last Error */
             last_error?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * SourceRef
@@ -1962,6 +2167,8 @@ export interface components {
             sent_at?: string | null;
             /** Channel Id */
             channel_id?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * StructuredVoiceTask
@@ -1999,6 +2206,8 @@ export interface components {
             quote: string;
             /** Action Proposal Id */
             action_proposal_id?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** SummaryLetter */
         SummaryLetter: {
@@ -2013,6 +2222,8 @@ export interface components {
              * @default []
              */
             task_ids: string[];
+        } & {
+            [key: string]: unknown;
         };
         /** TaskChangeIn */
         TaskChangeIn: {
@@ -2028,6 +2239,8 @@ export interface components {
             status?: ("assigned" | "accepted" | "in_progress" | "done" | "cancelled") | null;
             /** Result */
             result?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** TaskOut */
         TaskOut: {
@@ -2080,6 +2293,8 @@ export interface components {
              * @default false
              */
             overdue: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** TokenOut */
         TokenOut: {
@@ -2092,11 +2307,15 @@ export interface components {
              */
             token_type: "bearer";
             user: components["schemas"]["UserOut"];
+        } & {
+            [key: string]: unknown;
         };
         /** TranscriptIn */
         TranscriptIn: {
             /** Text */
             text: string;
+        } & {
+            [key: string]: unknown;
         };
         /** TranscriptSegment */
         TranscriptSegment: {
@@ -2108,6 +2327,13 @@ export interface components {
             text: string;
             /** Ts */
             ts?: string | null;
+            /**
+             * Injection Flag
+             * @default false
+             */
+            injection_flag: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** TrendPoint */
         TrendPoint: {
@@ -2121,6 +2347,8 @@ export interface components {
             numerator: number;
             /** Denominator */
             denominator: number;
+        } & {
+            [key: string]: unknown;
         };
         /** UserOut */
         UserOut: {
@@ -2136,6 +2364,8 @@ export interface components {
             department_id?: string | null;
             /** Employee Id */
             employee_id?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** ValidationError */
         ValidationError: {
@@ -2145,6 +2375,8 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        } & {
+            [key: string]: unknown;
         };
         /**
          * VoiceStructureOut
@@ -2160,6 +2392,8 @@ export interface components {
              * @default []
              */
             action_proposals: components["schemas"]["ActionOut"][];
+        } & {
+            [key: string]: unknown;
         };
         /**
          * VoiceTaskIn
@@ -2174,6 +2408,8 @@ export interface components {
              * @enum {string}
              */
             audio_origin: "speech_recognition" | "dictation" | "audio_file";
+        } & {
+            [key: string]: unknown;
         };
     };
     responses: never;
@@ -3057,6 +3293,142 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    status_stt_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["STTStatusOut"];
+                };
+            };
+        };
+    };
+    meeting_audio_meetings__meeting_id__audio_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meeting_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                } & {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudioTranscriptOut"];
+                };
+            };
+            /** @description Превышен лимит STT_MAX_MB */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Неподдерживаемый формат аудио */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Нет файла или речи в записи */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Распознавание отключено, недоступно или истёк таймаут */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    voice_audio_voice_audio_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                } & {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudioTranscriptOut"];
+                };
+            };
+            /** @description Превышен лимит STT_MAX_MB */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Неподдерживаемый формат аудио */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Нет файла или речи в записи */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Распознавание отключено, недоступно или истёк таймаут */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

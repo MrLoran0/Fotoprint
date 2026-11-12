@@ -171,6 +171,31 @@ HTTPS-адрес указывается в `LOCAL_BASE_URL`. Публикаци�
 не нужна. Проверить, что служебная авторизация vLLM работает у выбранной
 версии и ключ не попадает в журналы. Токены не передавать в командной строке.
 
+## Whisper в контуре заказчика
+
+1. На этапе подготовки скачайте многоязычные веса формата CTranslate2, например [faster-whisper-small](https://huggingface.co/Systran/faster-whisper-small). Скопируйте в контур каталог модели с `model.bin`, `config.json`, `tokenizer.json` и остальными файлами модели. API открывает локальный каталог и работает без загрузки весов во время распознавания.
+2. Для API вне Docker установите `pip install -r backend/requirements.txt -r backend/requirements-whisper.txt`. Укажите абсолютный путь к модели в `STT_WHISPER_MODEL_DIR` и включите `STT_PROVIDER=whisper`. Для CPU начните с `STT_WHISPER_DEVICE=cpu` и `STT_WHISPER_COMPUTE_TYPE=int8`.
+3. Для Compose задайте `INSTALL_WHISPER=true` и `STT_PROVIDER=whisper` в `.env`. Подмонтируйте каталог весов только для чтения, например через `compose.whisper.yml`:
+
+   ```yaml
+   services:
+     api:
+       environment:
+         STT_WHISPER_MODEL_DIR: /models/whisper-small
+       volumes:
+         - /srv/models/whisper-small:/models/whisper-small:ro
+   ```
+
+   ```bash
+   docker compose -f docker-compose.yml -f compose.whisper.yml up -d --build api web
+   ```
+
+4. Для NVIDIA установите CUDA-библиотеки cuBLAS 12 и cuDNN 9, совместимые с установленной версией CTranslate2. При работе в контейнере библиотеки должны быть доступны внутри образа, а GPU — передан через NVIDIA Container Toolkit. Добавьте `gpus: all` в секцию `api` файла переопределения Compose и задайте `STT_WHISPER_DEVICE=cuda`, `STT_WHISPER_COMPUTE_TYPE=float16` (или `int8_float16` для меньшего расхода VRAM). Используйте [инструкцию faster-whisper по CUDA](https://github.com/SYSTRAN/faster-whisper#gpu).
+
+В одном процессе API одновременно работает один процесс Whisper. Лимит синхронного ожидания `STT_TIMEOUT_S` включает очередь. При использовании нескольких API-воркеров резервируйте GPU-память под каждый воркер. Для длинных записей согласуйте `STT_MAX_MB`, таймауты и лимиты обратных прокси. Встроенный nginx передаёт загрузку потоком, проверка размера выполняется в API, а ожидание ответа для аудиомаршрутов ограничено 600 секундами.
+
+Для приёмки запросите `GET /stt/status` с токеном, затем загрузите образец речи на вкладке протокола и проверьте бейдж «🔒 распознано в контуре». Статус проверяет доступность весов и пакета. Работу CUDA проверяет фактическая загрузка записи. Замерьте время ответа и общую VRAM командой `nvidia-smi --query-gpu=timestamp,memory.used --format=csv -lms 200`. Для текста протокола задайте отдельный локальный `LLM_PROVIDER`.
+
 ## Коннекторы пилота
 
 | Источник | Уже в прототипе | План подключения и проверки прав |

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Feedback } from '../components/Feedback'
 import { api, ApiError, id, type S } from '../api/client'
 import { PeoplePicker, PersonSelect } from '../components/PeoplePicker'
+import { AudioProgress, AudioRoute } from '../components/AudioRecognition'
 import { ProtocolPrintButton } from '../components/ProtocolPrintButton'
 import { SourceList } from '../components/Sources'
 import { Badge, Button, Card, Empty, ErrorNote, Loading } from '../components/ui'
@@ -184,6 +185,7 @@ type NewItem = { key: number; segment_id: number; kind: Item['kind']; statement:
 
 function ProtocolEditor({ meeting, picker, onDirty }: { meeting: S['MeetingOut']; picker: React.ReactNode; onDirty: (dirty: boolean) => void }) {
   const ws = useWorkspace()
+  const sttStatus = useLoad(() => api.get<S['STTStatusOut']>('/stt/status'), [])
   const meetingId = meeting.id
   const [text, setText] = useDraft(`transcript-${meetingId}`, '')
   const [savedDraftId, setSavedDraftId] = useDraft(`protocol-${meetingId}`)
@@ -195,9 +197,17 @@ function ProtocolEditor({ meeting, picker, onDirty }: { meeting: S['MeetingOut']
   const [focusSeg, setFocusSeg] = useState<number>()
   const [newItems, setNewItems] = useState<NewItem[]>([])
   const [summary, setSummary] = useState('')
+  const [audio, setAudio] = useState<S['AudioTranscriptOut']>()
+  const [uploadPercent, setUploadPercent] = useState(0)
+  const [speakers, setSpeakers] = useState<Record<string, string>>({})
+  const filePicker = useRef<HTMLInputElement>(null)
+  const audioUpload = useRef<AbortController>(null)
   const locked = busy !== ''
   const alive = useRef(false)
-  useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
+  useEffect(() => {
+    alive.current = true
+    return () => { alive.current = false; audioUpload.current?.abort() }
+  }, [])
 
   async function run(key: string, fn: () => Promise<void>) {
     setBusy(key); setError('')
@@ -212,8 +222,34 @@ function ProtocolEditor({ meeting, picker, onDirty }: { meeting: S['MeetingOut']
   }
   const loadSample = () => run('sample', async () => {
     const rows = await api.get<{ text: string }[]>(`/meetings/${id(meetingId)}/transcripts`)
-    if (rows[0]) setText(rows[0].text); else setError('У этой встречи нет сохранённой расшифровки.')
+    if (rows[0]) {
+      setText(rows[0].text); setAudio(undefined); setSpeakers({})
+    } else setError('У этой встречи нет сохранённой расшифровки.')
   })
+  const uploadRecording = (file: File) => run('audio', async () => {
+    if (!/\.(mp3|m4a|wav|webm|ogg)$/i.test(file.name)) throw new Error('Формат записи не поддерживается. Используйте MP3, M4A, WAV, WebM или OGG.')
+    const limit = sttStatus.data?.max_mb
+    if (limit && file.size > limit * 1024 * 1024) throw new Error(`Запись больше допустимого размера (${limit} МБ).`)
+    const upload = new AbortController()
+    audioUpload.current = upload
+    setUploadPercent(0)
+    try {
+      const result = await api.uploadAudio(`/meetings/${id(meetingId)}/audio`, file, upload.signal, setUploadPercent)
+      if (!upload.signal.aborted) { setAudio(result); setText(result.text); setSpeakers({}) }
+    } finally {
+      audioUpload.current = null
+    }
+  })
+  function matchSpeaker(speaker: string, employeeId: string) {
+    const label = (value: string) => value ? employeeName(ws, value) : speaker
+    const previous = label(speakers[speaker])
+    const next = label(employeeId)
+    // Меняем только подпись говорящего в текущем тексте, сохраняя внесённые правки.
+    setText(text.replace(/^([ \t]*(?:\[\d{1,2}:\d{2}(?::\d{2})?\][ \t]*)?)([^:\[\]\r\n]{2,60}?)(:[ \t]*)/gm,
+      (line, prefix: string, name: string, delimiter: string) =>
+        name.trim() === previous ? `${prefix}${next}${delimiter}` : line))
+    setSpeakers({ ...speakers, [speaker]: employeeId })
+  }
   const extract = () => run('extract', async () => {
     const d = await api.post<S['ProtocolDraftOut']>(`/meetings/${id(meetingId)}/transcript`, { text })
     loadDraft(d); setSavedDraftId(d.id); setFocusSeg(undefined)
@@ -286,17 +322,37 @@ function ProtocolEditor({ meeting, picker, onDirty }: { meeting: S['MeetingOut']
           {picker}
           <p className="muted small">Участники: {meeting.participant_ids.map(p => employeeName(ws, p)).join(', ')}</p>
           <label>Текст расшифровки<textarea rows={10} maxLength={60000} value={text} disabled={locked} onChange={e => setText(e.target.value)} placeholder="[00:14] Анна Смирнова: Решили вернуть входной контроль…" /></label>
+          {audio && <>
+            <div className="row"><AudioRoute route={audio.route} /></div>
+            {audio.warnings.map(warning => <p key={warning} className="muted small">{warning}</p>)}
+            {[...new Set(audio.segments.map(segment => segment.speaker))].map(speaker =>
+              <label key={speaker}>{speaker}<select value={speakers[speaker] ?? ''} disabled={locked} onChange={e => matchSpeaker(speaker, e.target.value)}>
+                <option value="">Оставить подпись «{speaker}»</option>
+                {meeting.participant_ids.map(person => <option value={person} key={person}>{employeeName(ws, person)}</option>)}
+              </select></label>)}
+          </>}
+          {text.length > 60000 && <ErrorNote error="Для протокола оставьте до 60 000 символов расшифровки." />}
           <ErrorNote error={error} />
+          <input ref={filePicker} type="file" accept=".mp3,.m4a,.wav,.webm,.ogg" hidden onChange={e => {
+            const file = e.target.files?.[0]
+            e.target.value = ''
+            if (file) void uploadRecording(file)
+          }} />
+          {sttStatus.data?.available && sttStatus.data.route === 'external' &&
+            <p className="muted small">Запись будет передана внешнему сервису распознавания.</p>}
           <div className="row">
             <Button disabled={locked} busy={busy === 'sample'} onClick={() => void loadSample()}>Подставить расшифровку встречи</Button>
-            <Button kind="primary" disabled={locked || dirty || !text.trim()} busy={busy === 'extract'} onClick={() => void extract()}>Составить протокол</Button>
+            <Button disabled={locked || sttStatus.loading} busy={busy === 'audio'} onClick={() => filePicker.current?.click()}>Загрузить запись встречи</Button>
+            <Button kind="primary" disabled={locked || dirty || !text.trim() || text.length > 60000} busy={busy === 'extract'} onClick={() => void extract()}>Составить протокол</Button>
           </div>
+          {busy === 'audio' && <AudioProgress percent={uploadPercent} />}
           {busy === 'extract' && <Loading label="Ассистент раскладывает расшифровку на решения, предложения и задачи…" />}
         </div>
       </Card>
       {draft && <Card title="Исходные реплики" icon="◷" subtitle="Каждый пункт протокола опирается на цитату">
         <ol className="segments">{draft.segments.map(s => <li key={s.n} className={focusSeg === s.n ? 'focus' : ''} id={`seg-${s.n}`} tabIndex={-1}>
-          <span className="seg-n">{s.n}</span><span>{s.ts && <small className="muted">[{s.ts}] </small>}<strong>{s.speaker}:</strong> {s.text}</span>
+          <span className="seg-n">{s.n}</span><span>{s.ts && <small className="muted">[{s.ts}] </small>}<strong>{s.speaker}:</strong> {s.text}
+            {s.injection_flag && <Badge tone="warning">Подозрительная инструкция</Badge>}</span>
           {draft.status !== 'published' && <button type="button" className="text-button seg-add" disabled={locked} title="Модель пропустила пункт — добавить его к этой реплике"
             onClick={() => addFromSegment(s)}>+ пункт</button>}</li>)}</ol>
       </Card>}

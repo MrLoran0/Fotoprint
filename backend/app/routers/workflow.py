@@ -86,7 +86,10 @@ class ActionCreateIn(BaseModel):
 
 def draft_out(db: Session, protocol: Protocol) -> ProtocolDraftOut:
     out = ProtocolDraftOut.model_validate(protocol)
-    out.segments = [TranscriptSegment.model_validate(s) for s in db.get(Transcript, protocol.transcript_id).segments]
+    out.segments = [
+        TranscriptSegment.model_validate({**s, "injection_flag": suspicious(s["text"])})
+        for s in db.get(Transcript, protocol.transcript_id).segments
+    ]
     return out
 
 

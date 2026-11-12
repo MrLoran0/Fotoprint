@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, type S } from '../api/client'
-import { employeeName, useWorkspace } from '../lib/hooks'
+import { employeeName, useLoad, useWorkspace } from '../lib/hooks'
 import { dateTime } from '../lib/format'
 import { Badge, Button, ErrorNote, Modal } from './ui'
+import { AudioProgress, AudioRoute } from './AudioRecognition'
 
 interface SpeechRecognitionEvent {
   resultIndex: number
@@ -48,101 +49,159 @@ const DEMO_PROMPTS = [
   },
 ]
 
+const RECORDING_FORMATS = [
+  ['audio/webm;codecs=opus', 'webm'],
+  ['audio/ogg;codecs=opus', 'ogg'],
+  ['audio/mp4', 'm4a'],
+] as const
+
 export function VoiceModal({ onClose }: { onClose: () => void }) {
   const ws = useWorkspace()
+  const stt = useLoad(() => api.get<S['STTStatusOut']>('/stt/status'), [])
   const [text, setText] = useState('')
   const [isRecording, setIsRecording] = useState(false)
   const [recordSeconds, setRecordSeconds] = useState(0)
-  const [speechSupported, setSpeechSupported] = useState(true)
+  const [starting, setStarting] = useState(false)
+  const [progress, setProgress] = useState<number>()
+  const [route, setRoute] = useState<S['AudioTranscriptOut']['route']>()
+  const [origin, setOrigin] = useState<NonNullable<S['VoiceTaskIn']['audio_origin']>>('dictation')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<S['VoiceStructureOut']>()
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
-  const timerRef = useRef<number | null>(null)
+  const recorderRef = useRef<MediaRecorder>(null)
+  const uploadRef = useRef<AbortController>(null)
+  const alive = useRef(false)
+  const speechWindow = window as Window & {
+    SpeechRecognition?: new () => SpeechRecognitionInstance
+    webkitSpeechRecognition?: new () => SpeechRecognitionInstance
+  }
+  const SpeechAPI = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition
+  const format = typeof MediaRecorder === 'undefined' ? undefined
+    : RECORDING_FORMATS.find(([mime]) => MediaRecorder.isTypeSupported(mime))
+  const canRecord = !!(format && navigator.mediaDevices?.getUserMedia)
+  const locked = busy || isRecording || starting || progress !== undefined
 
   useEffect(() => {
-    const SpeechAPI = (window as unknown as {
-      SpeechRecognition?: new () => SpeechRecognitionInstance
-      webkitSpeechRecognition?: new () => SpeechRecognitionInstance
-    }).SpeechRecognition || (window as unknown as {
-      SpeechRecognition?: new () => SpeechRecognitionInstance
-      webkitSpeechRecognition?: new () => SpeechRecognitionInstance
-    }).webkitSpeechRecognition
-
-    if (!SpeechAPI) {
-      setSpeechSupported(false)
-      return
+    alive.current = true
+    return () => {
+      alive.current = false
+      uploadRef.current?.abort()
+      recorderRef.current?.stream.getTracks().forEach(track => track.stop())
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort() } catch {}
+      }
     }
+  }, [])
 
+  useEffect(() => {
+    if (!isRecording) return
+    const timer = window.setInterval(() => setRecordSeconds(seconds => seconds + 1), 1000)
+    return () => window.clearInterval(timer)
+  }, [isRecording])
+
+  async function recognizeRecording(file: File) {
+    const upload = new AbortController()
+    uploadRef.current = upload
+    setProgress(0)
+    try {
+      const audio = await api.uploadAudio('/voice/audio', file, upload.signal, setProgress)
+      if (upload.signal.aborted) return
+      setText(audio.segments.map(segment => segment.text).join('\n'))
+      setRoute(audio.route)
+      setOrigin('audio_file')
+      setResult(undefined)
+    } catch (e) {
+      if (!upload.signal.aborted) setError((e as Error).message)
+    } finally {
+      if (!upload.signal.aborted) setProgress(undefined)
+      uploadRef.current = null
+    }
+  }
+
+  async function startServerRecording() {
+    if (!stt.data?.available || !format) return
+    const [mimeType, extension] = format
+    const maxMb = stt.data.max_mb
+    setStarting(true)
+    setError('')
+    let stream: MediaStream | undefined
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      if (!alive.current) { stream.getTracks().forEach(track => track.stop()); return }
+      const recorder = new MediaRecorder(stream, { mimeType })
+      const chunks: Blob[] = []
+      let size = 0
+      let failed = false
+      recorder.ondataavailable = e => {
+        if (!alive.current || failed || !e.data.size) return
+        size += e.data.size
+        if (size > maxMb * 1024 * 1024) {
+          failed = true
+          setError(`Запись больше допустимого размера (${maxMb} МБ).`)
+          if (recorder.state !== 'inactive') recorder.stop()
+        } else chunks.push(e.data)
+      }
+      recorder.onerror = () => {
+        failed = true
+        if (alive.current) setError('Не удалось записать звук с микрофона.')
+      }
+      recorder.onstop = () => {
+        recorder.stream.getTracks().forEach(track => track.stop())
+        recorderRef.current = null
+        if (!alive.current) return
+        setIsRecording(false)
+        if (failed) return
+        if (!size) { setError('Запись пуста. Попробуйте ещё раз.'); return }
+        void recognizeRecording(new File(chunks, `dictation.${extension}`, { type: mimeType }))
+      }
+      recorder.start(1000)
+      recorderRef.current = recorder
+      setRecordSeconds(0)
+      setIsRecording(true)
+    } catch (e) {
+      stream?.getTracks().forEach(track => track.stop())
+      if (alive.current) setError(`Не удалось включить микрофон: ${(e as Error).message}`)
+    } finally {
+      if (alive.current) setStarting(false)
+    }
+  }
+
+  function startBrowserRecording() {
+    if (!SpeechAPI) return
+    setError('')
     try {
       const rec = new SpeechAPI()
       rec.lang = 'ru-RU'
       rec.continuous = true
       rec.interimResults = true
-
-      rec.onresult = (e: SpeechRecognitionEvent) => {
-        let fullTranscript = ''
-        for (let i = 0; i < e.results.length; i++) {
-          fullTranscript += e.results[i][0].transcript + ' '
+      rec.onresult = e => {
+        if (!alive.current) return
+        const words = Array.from(e.results, result => result[0].transcript).join(' ').trim()
+        if (words) {
+          setText(words); setOrigin('speech_recognition'); setRoute(undefined); setResult(undefined)
         }
-        setText(fullTranscript.trim())
       }
-
-      rec.onerror = (e) => {
-        if (e.error !== 'no-speech') {
-          setError(`Ошибка распознавания речи: ${e.error}`)
-        }
-        stopRecording()
-      }
-
+      rec.onerror = e => { if (alive.current) setError(`Ошибка распознавания браузером: ${e.error}`) }
       rec.onend = () => {
-        setIsRecording(false)
-        if (timerRef.current) {
-          clearInterval(timerRef.current)
-          timerRef.current = null
-        }
+        recognitionRef.current = null
+        if (alive.current) setIsRecording(false)
       }
-
+      rec.start()
       recognitionRef.current = rec
-    } catch {
-      setSpeechSupported(false)
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        try { recognitionRef.current.abort() } catch {}
-      }
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [])
-
-  function startRecording() {
-    setError('')
-    if (!recognitionRef.current) return
-    try {
-      setText('')
-      setResult(undefined)
       setRecordSeconds(0)
-      recognitionRef.current.start()
       setIsRecording(true)
-      timerRef.current = window.setInterval(() => {
-        setRecordSeconds(s => s + 1)
-      }, 1000)
     } catch (e) {
       setError(`Не удалось включить микрофон: ${(e as Error).message}`)
-      setIsRecording(false)
     }
   }
 
   function stopRecording() {
-    if (recognitionRef.current && isRecording) {
-      try { recognitionRef.current.stop() } catch {}
-    }
-    setIsRecording(false)
-    if (timerRef.current) {
-      clearInterval(timerRef.current)
-      timerRef.current = null
+    const recorder = recorderRef.current
+    if (recorder && recorder.state !== 'inactive') recorder.stop()
+    else if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch { setIsRecording(false) }
     }
   }
 
@@ -157,7 +216,7 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
     setBusy(true)
     setError('')
     try {
-      const res = await api.post<S['VoiceStructureOut']>('/voice/structure', { text: text.trim() })
+      const res = await api.post<S['VoiceStructureOut']>('/voice/structure', { text: text.trim(), audio_origin: origin })
       setResult(res)
     } catch (e) {
       setError((e as Error).message)
@@ -177,7 +236,7 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
         <span className="eyebrow">Автоматизация руководителя</span>
         <h2>🎙️ Голосовой ввод поручений</h2>
         <p className="muted">
-          Диктуйте задания голосом. AI-ассистент выделит исполнителей, сроки и критерии готовности и подготовит карточки — без вашего подтверждения ничего не создаётся. Речь распознаёт браузер (в Chrome — облачный сервис Google); в пилоте — распознавание в контуре компании.
+          Продиктуйте поручения и проверьте текст. Поручения попадут в реестр после подтверждения карточек.
         </p>
       </div>
       <button className="icon-button" onClick={onClose} aria-label="Закрыть">×</button>
@@ -193,15 +252,19 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
                 <span className="rec-dot" /> Запись речи: <strong>{formatDuration(recordSeconds)}</strong>
               </span>
             ) : (
-              <span className="muted small">Нажмите кнопку, чтобы начать диктовку</span>
+              <span className="muted small">
+                {stt.loading ? 'Проверяем настройки распознавания…' : stt.error || stt.data?.message ||
+                  (canRecord ? (stt.data?.route === 'external' ? 'Аудио будет передано внешнему сервису.' : 'Аудио распознаётся в контуре.') :
+                    'Для записи нужен поддерживаемый браузер и HTTPS или localhost.')}
+              </span>
             )}
           </div>
-          {speechSupported ? (
+          {(isRecording || (canRecord && stt.data?.available)) && (
             <button
               type="button"
               className={`button voice-rec-btn ${isRecording ? 'recording danger' : 'primary'}`}
-              onClick={isRecording ? stopRecording : startRecording}
-              disabled={busy}
+              onClick={isRecording ? stopRecording : () => void startServerRecording()}
+              disabled={!isRecording && locked}
             >
               {isRecording ? (
                 <>
@@ -213,8 +276,6 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
                 </>
               )}
             </button>
-          ) : (
-            <Badge tone="warning">Микрофон в браузере недоступен</Badge>
           )}
         </div>
 
@@ -231,6 +292,13 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
+      {progress !== undefined && <AudioProgress percent={progress} />}
+      {route && <div><AudioRoute route={route} /></div>}
+      {SpeechAPI && !isRecording && <details>
+        <summary>Запасной вариант — распознавание браузером</summary>
+        <p className="muted small">Браузер может отправить аудио в облако. Chrome использует сервис Google.</p>
+        <Button disabled={locked} onClick={startBrowserRecording}>Начать распознавание браузером</Button>
+      </details>}
 
       {/* Быстрые примеры для проверки */}
       <div className="voice-chips-section">
@@ -241,9 +309,11 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
               key={idx}
               type="button"
               className="voice-chip-btn"
+              disabled={locked}
               onClick={() => {
-                stopRecording()
                 setText(p.text)
+                setOrigin('dictation')
+                setRoute(undefined)
                 setResult(undefined)
                 setError('')
               }}
@@ -266,14 +336,16 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
           value={text}
           onChange={e => setText(e.target.value)}
           placeholder="Например: Смирнова, подготовь итоговый отчет по браку УФ-печати к следующей пятнице, ожидаем снижение брака до 3%..."
-          disabled={busy || isRecording}
+          disabled={locked}
+          maxLength={5000}
         />
         <div className="voice-input-actions">
           {text && (
             <button
               type="button"
               className="text-button"
-              onClick={() => { setText(''); setResult(undefined); setError('') }}
+              disabled={locked}
+              onClick={() => { setText(''); setResult(undefined); setError(''); setRoute(undefined); setOrigin('dictation') }}
             >
               Очистить
             </button>
@@ -282,7 +354,7 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
             kind="primary"
             className="push"
             busy={busy}
-            disabled={!text.trim() || isRecording}
+            disabled={!text.trim() || text.trim().length > 5000 || locked}
             onClick={handleStructure}
           >
             ✦ Структурировать поручения
@@ -291,6 +363,7 @@ export function VoiceModal({ onClose }: { onClose: () => void }) {
       </div>
 
       <ErrorNote error={error} />
+      {text.trim().length > 5000 && <ErrorNote error="Сократите диктовку до 5 000 символов перед структурированием." />}
 
       {/* Предупреждение сервера (например, отклонение инъекций или закрытая тема) */}
 

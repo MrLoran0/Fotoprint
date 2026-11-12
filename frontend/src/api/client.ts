@@ -27,13 +27,20 @@ export async function request<T>(path: string, method = 'GET', body?: unknown): 
   } catch {
     throw new ApiError(0, 'Нет связи с сервером. Повторите, когда связь появится.')
   }
+  return readResponse<T>(response, token)
+}
+
+async function readResponse<T>(response: Response, token: string | null, audioUpload = false): Promise<T> {
   if (!response.ok) {
     const error = await response.json().catch(() => null)
     if (response.status === 401 && token && token === sessionStorage.getItem(tokenKey)) {
       window.dispatchEvent(new Event('fokus-unauthorized'))
     }
     const detail = typeof error?.detail === 'string' ? error.detail
-      : Array.isArray(error?.detail) ? 'Проверьте заполнение полей.' : `Ошибка сервера (${response.status}).`
+      : Array.isArray(error?.detail) ? 'Проверьте заполнение полей.'
+      : audioUpload && response.status === 413 ? 'Запись превышает допустимый размер.'
+      : audioUpload && response.status === 503 ? 'Распознавание сейчас недоступно. Повторите позже.'
+      : `Ошибка сервера (${response.status}).`
     throw new ApiError(response.status, detail, error?.code)
   }
   const result = response.status === 204 ? undefined : await response.json()
@@ -43,10 +50,36 @@ export async function request<T>(path: string, method = 'GET', body?: unknown): 
   return result as T
 }
 
+function uploadAudio(path: string, file: File, signal: AbortSignal, progress: (percent: number) => void) {
+  const token = sessionStorage.getItem(tokenKey)
+  return new Promise<S['AudioTranscriptOut']>((resolve, reject) => {
+    if (signal.aborted) { reject(signal.reason); return }
+    const xhr = new XMLHttpRequest()
+    const abort = () => xhr.abort()
+    xhr.open('POST', `${base}${path}`)
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    xhr.upload.onprogress = e => { if (e.lengthComputable) progress(Math.floor(e.loaded * 100 / e.total)) }
+    xhr.upload.onload = () => progress(100)
+    xhr.onload = () => {
+      const response = new Response(xhr.status === 204 ? null : xhr.responseText, { status: xhr.status })
+      readResponse<S['AudioTranscriptOut']>(response, token, true)
+        .then(resolve, reject)
+    }
+    xhr.onerror = () => reject(new ApiError(0, 'Нет связи с сервером. Повторите загрузку.'))
+    xhr.onabort = () => reject(signal.reason)
+    xhr.onloadend = () => signal.removeEventListener('abort', abort)
+    signal.addEventListener('abort', abort)
+    const form = new FormData()
+    form.append('file', file)
+    xhr.send(form)
+  })
+}
+
 export const api = {
   get: <T,>(path: string) => request<T>(path),
   post: <T,>(path: string, body?: unknown) => request<T>(path, 'POST', body),
   patch: <T,>(path: string, body: unknown) => request<T>(path, 'PATCH', body),
+  uploadAudio,
 }
 
 export async function login(login: string, password: string) {

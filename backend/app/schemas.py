@@ -210,6 +210,7 @@ class TranscriptSegment(BaseModel):
     speaker: str
     text: str
     ts: str | None = None
+    injection_flag: bool = False
 
 
 class ProtocolDraftOut(Out):
@@ -223,6 +224,30 @@ class ProtocolDraftOut(Out):
     model: str
     items: list[ProtocolItemOut]
     segments: list[TranscriptSegment] = []
+
+
+class AudioSegment(BaseModel):
+    start: float = Field(ge=0, allow_inf_nan=False)
+    end: float = Field(ge=0, allow_inf_nan=False)
+    speaker: str
+    text: str
+
+
+class AudioTranscriptOut(BaseModel):
+    text: str
+    segments: list[AudioSegment]
+    route: Route
+    model: str
+    duration_s: float = Field(ge=0, allow_inf_nan=False)
+    warnings: list[str]
+
+
+class STTStatusOut(BaseModel):
+    configured: bool
+    available: bool
+    route: Route | None
+    max_mb: int
+    message: str | None
 
 
 class TranscriptIn(BaseModel):

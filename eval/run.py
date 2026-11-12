@@ -180,7 +180,7 @@ class Runner:
 def write_report(path, result):
     fake = result['provider'] == 'fake'
     label = 'ТЕХНИЧЕСКИЙ ПРОГОН fake — НЕ качество AI' if fake else 'Оценка ответов модели на синтетическом наборе'
-    lines = ['# Eval «Фокус»', '', label, '',
+    lines = ['# Оценка качества AI-ассистента', '', label, '',
              f"Дата UTC: {result['created_at']}. Commit: `{result['commit']}`.",
              f"Provider: `{result['provider']}`; model: `{result['health']['llm']['model']}`; route: `{result['health']['llm']['route']}`.",
              f"Время сценария: `{result['health']['scenario_now']}`. Последовательный прогон; повторов нет.", '',

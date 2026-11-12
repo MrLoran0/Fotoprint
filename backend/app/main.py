@@ -9,7 +9,7 @@ from . import __version__
 from .config import get_settings
 from .db import SessionLocal, init_db
 from .llm import LLMError
-from .routers import assistant, auth, decisions, directory, graph, history, planning, sources, system, voice, workflow
+from .routers import assistant, audio, auth, decisions, directory, graph, history, planning, sources, system, voice, workflow
 from .seed import is_seeded, seed_all
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -52,6 +52,7 @@ app.include_router(auth.router)
 app.include_router(auth.me_router)
 app.include_router(directory.router)
 app.include_router(workflow.router)
+app.include_router(audio.router)
 app.include_router(assistant.router)
 app.include_router(history.router)
 app.include_router(sources.router)

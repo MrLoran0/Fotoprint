@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Literal
 from zoneinfo import ZoneInfo
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 log = logging.getLogger("fokus")
@@ -47,6 +48,16 @@ class Settings(BaseSettings):
     local_api_key: str = ""
     local_model: str = ""
     llm_timeout_s: float = 180.0
+
+    # Распознавание аудио имеет собственный маршрут, независимо от LLM_PROVIDER.
+    stt_provider: str = "off"
+    stt_max_mb: int = Field(default=200, ge=1)
+    stt_timeout_s: float = Field(default=240, gt=0, allow_inf_nan=False)
+    stt_whisper_model_dir: Path = Path("/models/whisper")
+    stt_whisper_device: Literal["cpu", "cuda"] = "cpu"
+    stt_whisper_compute_type: str = "int8"
+    stt_openai_model: str = "gpt-transcribe"
+    stt_gemini_model: str = "gemini-2.5-flash"
 
     smtp_host: str = "mailpit"
     smtp_port: int = 1025
